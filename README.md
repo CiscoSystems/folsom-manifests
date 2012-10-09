@@ -42,8 +42,12 @@ the corresponding NAT and forwarding configuration.
 Customizing your environment
 ------------------------
 
+Under the manifests folder you will find these three files:
+- site.pp
+- cobbler-node.pp
+- clean_node.sh
 
-YOU MUST THEN EDIT THESE FILES.  They are fairly well documented, but please comment with questions. You can also 
+IMPORTANT! You must edit these files.  They are fairly well documented, but please comment with questions. You can also 
 read through these descriptions: [Cobbler Node](https://github.com/CiscoSystems/folsom-manifests/blob/simple-multi-node/Cobbler-Node.md)  and [Site](https://github.com/CiscoSystems/folsom-manifests/blob/simple-multi-node/Site.md)
 
 Then 'puppet apply' it:
@@ -54,11 +58,11 @@ I recommend a reboot at this point, as it seems that the puppetmaster doesn't re
 
 And now you should be able to load up your cobbled nodes:
 
-	~/os-docs/examples/clean_node.sh {node_name} example.com
+	./clean_node.sh {node_name} example.com
 
 or if you want to do it for _all_ of the nodes defined in your cobbler-node.pp file:
 
-	for n in `cobbler system list`; do ~/os-docs/examples/clean_node.sh $n example.com ; done
+	for n in `cobbler system list`; do clean_node.sh $n example.com ; done
 
 _note: replace example.com with your nodes proper domain name._
 
