@@ -44,8 +44,7 @@ Customizing your environment
 
 
 YOU MUST THEN EDIT THESE FILES.  They are fairly well documented, but please comment with questions. You can also 
-read through these descriptions: [Cobbler Node](https://github.com/CiscoSystems/cisco-openstack-docs/blob/master/C
-obbler-Node.md)  and [Site](https://github.com/CiscoSystems/cisco-openstack-docs/blob/master/Site.md)
+read through these descriptions: [Cobbler Node](https://github.com/CiscoSystems/folsom-manifests/blob/simple-multi-node/Cobbler-Node.md)  and [Site](https://github.com/CiscoSystems/folsom-manifests/blob/simple-multi-node/Site.md)
 
 Then 'puppet apply' it:
 
