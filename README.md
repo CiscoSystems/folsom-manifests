@@ -18,5 +18,5 @@ Testing OpenStack
 -----------------
 
 
-http://ip-of-your-control-node
+http://ip-of-your-control-node/horizon
 user: admin, password: Cisco123 (if you didn't change the defaults in the site.pp file)
