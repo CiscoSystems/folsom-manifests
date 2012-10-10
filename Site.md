@@ -39,4 +39,4 @@ Cobbler should be ready to build your machines, and when they start, puppet shou
 
 	sudo tail -f /var/log/syslog
 
-Once things are running, you will still need to load an image (via the CLI on the control node most likley), and then you can manage most of the system from the web-ui (http://$controller_node_public use the admin user and the password you defined in the site.pp for admin_password).
+Once things are running, you will still need to load an image (via the CLI on the control node most likley), and then you can manage most of the system from the web-ui (http://$controller_node_public/horizon use the admin user and the password you defined in the site.pp for admin_password).
