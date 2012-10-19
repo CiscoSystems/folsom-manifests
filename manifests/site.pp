@@ -26,8 +26,8 @@ apt::source { "cisco-openstack-mirror_folsom-proposed":
 	release => "folsom-proposed",
 	repos => "main",
 	key => "E8CC67053ED3B199",
-	key_server => "pgpkeys.mit.edu"
-        #key_server => "hkp://pgpkeys.mit.edu:443"
+	#key_server => "pgpkeys.mit.edu"
+        key_server => "hkp://keyserver.ubuntu.com:80"
 }
 
 
@@ -44,7 +44,7 @@ $public_interface        = 'eth0'
 # assumes that eth1 is the interface that will be used for the vm network
 # this configuration assumes this interface is active but does not have an
 # ip address allocated to it.
-$private_interface       = 'eth0.40'
+$private_interface       = 'eth1'
 # credentials
 $admin_email             = 'root@localhost'
 $admin_password          = 'Cisco123'
@@ -54,15 +54,20 @@ $nova_db_password        = 'nova_pass'
 $nova_user_password      = 'nova_pass'
 $glance_db_password      = 'glance_pass'
 $glance_user_password    = 'glance_pass'
-$glance_on_swift         = 'false'
+$glance_on_swift         = false
 $rabbit_password         = 'openstack_rabbit_password'
 $rabbit_user             = 'openstack_rabbit_user'
+# Change the following addresses.
+# Fixed addresses are used "inside" the iptables nat for mutli-host networking
 $fixed_network_range     = '10.4.0.0/24'
+# Floating addresses are used for 1:1 NAT in multi-host networking, these are usually accessible from "outside"
 $floating_ip_range       = '192.168.160.0/24'
+# NTP is very important for puppet.  This should be an accessible NTP server (often the public gw router will work)
+$ntp_address		 = '192.168.150.1'
 # switch this to true to have all service log at verbose
-$verbose                 = 'false'
+$verbose                 = false
 # by default it does not enable atomatically adding floating IPs
-$auto_assign_floating_ip = 'false'
+$auto_assign_floating_ip = false
 # Swift addresses:
 #$swift_proxy_address    = 'swiftproxy'
 #### end shared variables #################
@@ -75,8 +80,8 @@ $controller_node_public        = $controller_node_address
 $controller_node_internal      = $controller_node_address
 
 $controller_hostname           = 'control'
-# The bind address for corosync. Should match the subnet the controller
-# nodes use for the actual IP addresses
+$build_node_hostname           = 'build-node'
+
 $controller_node_network       = '192.168.150.0'
 
 $sql_connection = "mysql://nova:${nova_db_password}@${controller_node_address}/nova"
@@ -97,14 +102,15 @@ host { $controller_hostname:
 
 # Load the cobbler node defintios needed for the preseed of nodes
 import 'cobbler-node'
-# expot an authhorized keys file to the root user of all nodes.
+
+# export an authhorized keys file to the root user of all nodes.
 # This is most useful for testing.
 #import 'ssh-keys'
 #import 'clean-disk'
 #Common configuration for all node compute, controller, storage but puppet-master/cobbler
 node ntp {
  class { ntp:
-    servers => [ "192.168.150.254" ],
+    servers => [ "${ntp_address}" ],
     ensure => running,
     autoupdate => true,
   }
@@ -120,11 +126,11 @@ node glance_import_2 inherits ntp {
 
 $release = 'precise'
 $image_name = "${release}.img"
-$image_uri = "http://build-node/${image_name}"
+$image_uri = "http://${build_node_hostname}/${image_name}"
 $os_tenant = 'openstack'
 $os_username = 'admin'
 $os_password = 'Cisco123'
-$os_auth_url = "http://192.168.150.11:5000/v2.0/"
+$os_auth_url = "http://${controller_node_internal}:5000/v2.0/"
 
 exec {"glance add -T ${os_tenant} -N ${os_auth_url} -K ${os_password} -I ${os_username} name=${release}-puppet is_public=true disk_format='qcow2' container_format='bare' copy_from=${image_uri}":
   path => ['/bin','/usr/bin'],
@@ -170,17 +176,10 @@ node /control/ inherits glance_import {
     controller_node      => $controller_node_internal,
   }
 
-# configure the keystone service user and endpoint
-  #class { 'swift::keystone::auth':
-  #  auth_name => $swift_user,
-  #  password => $swift_user_password,
-  #  address  => $swift_proxy_address,
-  #}
-
 }
 
 
-node /compute0/ inherits compute_base {
+node /compute/ inherits compute_base {
 
   class { 'openstack::auth_file':
     admin_password       => $admin_password,
@@ -213,11 +212,11 @@ node /compute0/ inherits compute_base {
 
 }
 
-node /build-node/ inherits "cobbler-node" {
+node /$build_node_hostname/ inherits "cobbler-node" {
  
 #change the servers for your NTP environment
   class { ntp:
-    servers => [ "ntp.esl.cisco.com"],
+    servers => [ "${ntp_address}"],
     ensure => running,
     autoupdate => true,
   }
@@ -231,7 +230,7 @@ node /build-node/ inherits "cobbler-node" {
   class { puppet:
     run_master => true,
     puppetmaster_address => $::fqdn,
-    certname => 'build-node.cisco.openstack.com',
+    certname => $::fqdn,
     mysql_password => 'ubuntu',
   }<-
   file {'/etc/puppet/files':
