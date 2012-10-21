@@ -1,6 +1,4 @@
-
-#
-# == Example
+# == Example ===
 #
 # add this to your site.pp file:
 # import "cobbler-node"
@@ -19,7 +17,6 @@
 $cobbler_node_ip = "192.168.150.254"
 
 node /cobbler-node/ {
-
 
  class { cobbler:
   node_subnet => '192.168.150.0',
@@ -70,25 +67,12 @@ cobbler::node { "control":
  ip => "192.168.150.11",
  domain => "cisco.openstack.com",
  preseed => "/etc/cobbler/preseeds/cisco-preseed",
-# power_address => "171.71.119.42",
  power_address=>"172.20.231.46",
  power_type => "ipmitool",
  power_user => "admin",
  power_password => "c3l123",
  }
 
-# Currently in use as the build node.
-#cobbler::node { "build-os":
-# mac => "A4:4C:11:13:98:21",
-# profile => "precise-x86_64-auto",
-# ip => "192.168.200.254",
-# domain => "ctocllab.cisco.com",
-# preseed => "/etc/cobbler/preseeds/cisco-preseed",
-# power_address => "192.168.200.4",
-# power_type => "ipmitool",
-# power_user => "admin",
-#  power_password => "password",
-# }
 
 cobbler::node { "compute01":
  mac => "00:10:18:65:C7:80",
@@ -96,7 +80,6 @@ cobbler::node { "compute01":
  ip => "192.168.150.12",
  domain => "cisco.openstack.com",
  preseed => "/etc/cobbler/preseeds/cisco-preseed",
- #power_address => "171.71.119.43",
  power_address => "172.20.231.47",
  power_type => "ipmitool",
  power_user => "admin",
@@ -109,27 +92,11 @@ cobbler::node { "compute02":
  ip => "192.168.150.13",
  domain => "cisco.openstack.com",
  preseed => "/etc/cobbler/preseeds/cisco-preseed",
- #power_address => "171.71.119.44",
  power_address => "172.20.231.48",
  power_type => "ipmitool",
  power_user => "admin",
  power_password => "c3l123",
  }
-
-
-#cobbler::node { "compute03":
-# mac => "F8:66:F2:22:EE:52",
-# profile => "precise-x86_64-auto",
-# ip => "192.168.150.14",
-# domain => "cisco.openstack.com",
-# preseed => "/etc/cobbler/preseeds/cisco-preseed",
-# #power_address => "171.71.119.5",
-# power_address => "171.71.95.92",
-# power_type => "ipmitool",
-# power_user => "admin",
-# power_password => "c3l123",
-# }
-
 
 # Repeat as necessary.
 }
