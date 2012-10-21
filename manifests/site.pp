@@ -58,9 +58,9 @@ $rabbit_user             = 'openstack_rabbit_user'
 $fixed_network_range     = '10.4.0.0/24'
 $floating_ip_range       = '192.168.150.200/32'
 # switch this to true to have all service log at verbose
-$verbose                 = 'false'
+$verbose                 = false
 # by default it does not enable atomatically adding floating IPs
-$auto_assign_floating_ip = 'false'
+$auto_assign_floating_ip = false
 #### end shared variables #################
 
 # multi-node specific parameters
@@ -70,8 +70,6 @@ $controller_node_public        = $controller_node_address
 $controller_node_internal      = $controller_node_address
 
 $controller_hostname           = 'control'
-# The bind address for corosync. Should match the subnet the controller
-# nodes use for the actual IP addresses
 $controller_node_network       = '192.168.150.0'
 
 $sql_connection = "mysql://nova:${nova_db_password}@${controller_node_address}/nova"
@@ -93,7 +91,7 @@ import 'cobbler-node'
 #Common configuration for all node compute, controller, storage but puppet-master/cobbler
 node ntp {
  class { ntp:
-    servers => [ "192.168.150.254" ],
+    servers => [ "${ntp_address}" ],
     ensure => running,
     autoupdate => true,
   }
@@ -269,11 +267,11 @@ class { 'collectd':
 
 }
 
-node /build-node/ inherits "cobbler-node" {
+node /$build_node_hostname/ inherits "cobbler-node" {
  
 #change the servers for your NTP environment
   class { ntp:
-    servers => [ "ntp.esl.cisco.com"],
+    servers => [ "${ntp_address}"],
     ensure => running,
     autoupdate => true,
   }
@@ -297,8 +295,8 @@ class { 'graphite':
 # set the right local puppet environment up.  This builds puppetmaster with storedconfigs (a nd a local mysql instance)
   class { puppet:
     run_master 			=> true,
-    puppetmaster_address 	=> 'build-node.cisco.openstack.com',
-    certname 			=> 'build-node.cisco.openstack.com',
+    puppetmaster_address 	=> $::fqdn, 
+    certname 			=> $::fqdn,
     mysql_password 		=> 'ubuntu',
   }<-
   file {'/etc/puppet/files':
