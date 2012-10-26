@@ -33,6 +33,7 @@ apt::source { "cisco-openstack-mirror_folsom-proposed":
 # this section is used to specify global variables that will
 # be used in the deployment of multi and single node openstack
 # environments
+$build_node_fqdn	= 'build-node.ctoccllab.cisco.com'
 $multi_host		= true
 # By default, corosync uses multicasting. It is possible to disable
 # this if your environment require it
@@ -100,7 +101,7 @@ node ntp {
 node /control/ {
 
 class { 'collectd':
-        graphitehost => 'build-node.cisco.openstack.com',
+        graphitehost => "${build_node_fqdn}",
 }
 
   class { 'openstack::controller':
@@ -147,15 +148,15 @@ class { 'collectd':
     quantum_rabbit_virtual_host  => "/quantum",
     quantum_control_exchange     => "quantum",
     quantum_core_plugin          => "quantum.plugins.openvswitch.ovs_quantum_plugin.OVSQuantumPluginV2",
-    ovs_bridge_uplinks      	 => ['br-ex:eth0.40'],
+    ovs_bridge_uplinks      	 => ['br-ex:eth1'],
     ovs_bridge_mappings          => ['default:br-ex'],
-    ovs_tenant_network_type  	 => "vlan",
+    ovs_tenant_network_type  	 => "gre",
     ovs_network_vlan_ranges  	 => "default:1000:2000",
     ovs_integration_bridge   	 => "br-int",
-    ovs_enable_tunneling    	 => "False",
+    ovs_enable_tunneling    	 => "True",
     ovs_tunnel_bridge        	 => "br-tun",
     ovs_tunnel_id_ranges     	 => "1:1000",
-    ovs_local_ip             	 => "10.0.0.1",
+    ovs_local_ip             	 => $ipaddress_eth0,
     ovs_server               	 => false,
     ovs_root_helper          	 => "sudo quantum-rootwrap /etc/quantum/rootwrap.conf",
     ovs_sql_connection       	 => "mysql://quantum:quantum@${controller_node_address}/quantum",
@@ -173,7 +174,7 @@ class { 'collectd':
     quantum_port                 => '9696',
     quantum_region               => 'RegionOne',
     l3_interface_driver          => "quantum.agent.linux.interface.OVSInterfaceDriver",
-    l3_use_namespaces            => "False",
+    l3_use_namespaces            => "True",
     l3_metadata_ip               => "169.254.169.254",
     l3_external_network_bridge   => "br-ex",
     l3_root_helper               => "sudo /usr/bin/quantum-rootwrap /etc/quantum/rootwrap.conf",
@@ -181,7 +182,7 @@ class { 'collectd':
     dhcp_state_path         	 => "/var/lib/quantum",
     dhcp_interface_driver   	 => "quantum.agent.linux.interface.OVSInterfaceDriver",
     dhcp_driver        	 	 => "quantum.agent.linux.dhcp.Dnsmasq",
-    dhcp_use_namespaces     	 => "False",
+    dhcp_use_namespaces     	 => "True",
   }
 
   class { 'openstack::auth_file':
@@ -202,7 +203,7 @@ node /compute0/ inherits compute_base {
   }
 
 class { 'collectd':
-        graphitehost => 'build-node.cisco.openstack.com',
+        graphitehost => "${build_node_fqdn}", 
 }
 
   class { 'openstack::compute':
@@ -251,15 +252,15 @@ class { 'collectd':
     quantum_mac_generation_retries 	=> 16,
     quantum_dhcp_lease_duration    	=> 120,
     #quantum ovs
-    ovs_bridge_uplinks      		=> ['br-ex:eth0.40'],
+    ovs_bridge_uplinks      		=> ['br-ex:eth1'],
     ovs_bridge_mappings      		=> ['default:br-ex'],
-    ovs_tenant_network_type  		=> "vlan",
+    ovs_tenant_network_type  		=> "gre",
     ovs_network_vlan_ranges  		=> "default:1000:2000",
     ovs_integration_bridge   		=> "br-int",
-    ovs_enable_tunneling    		=> "False",
+    ovs_enable_tunneling    		=> "True",
     ovs_tunnel_bridge       	 	=> "br-tun",
     ovs_tunnel_id_ranges     		=> "1:1000",
-    ovs_local_ip             		=> "10.0.0.1",
+    ovs_local_ip             		=> $ipaddress_eth0,
     ovs_server               		=> false,
     ovs_root_helper          		=> "sudo quantum-rootwrap /etc/quantum/rootwrap.conf",
     ovs_sql_connection       		=> "mysql://quantum:quantum@${controller_node_address}/quantum",
@@ -267,7 +268,7 @@ class { 'collectd':
 
 }
 
-node /$build_node_hostname/ inherits "cobbler-node" {
+node /$build_node_fqdn/ inherits "cobbler-node" {
  
 #change the servers for your NTP environment
   class { ntp:
@@ -280,11 +281,11 @@ node /$build_node_hostname/ inherits "cobbler-node" {
 class { 'nagios': }
 
 class { 'collectd': 
-	graphitehost => 'build-node.cisco.openstack.com',
+	graphitehost => "${build_node_fqdn}", 
 }
 
 class { 'graphite': 
-	graphitehost => 'build-node.cisco.openstack.com',
+	graphitehost => "${build_node_fqdn}",
 }
 
 
