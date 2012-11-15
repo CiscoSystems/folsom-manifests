@@ -7,26 +7,25 @@
 # from potentially running again
 $initial_setup           = true
 
+
+########### Proxy Configuration ##########
+# If you use an HTTP/HTTPS proxy, point this at its URL.
+$proxy			= false
+
+      
+
 # Deploy a script that can be used to test nova
 class { 'openstack::test_file': }
 
 ########### Folsom Release ###############
 # Load apt prerequisites.  This is only valid on Ubuntu systmes
-exec { "apt-update" :
-	command => "/usr/bin/apt-get update",
-	refreshonly => true,
-}
-
-Apt::Source <| |> ~> Exec["apt-update"]
-
-Exec["apt-update"] -> Package <| |>
-
 apt::source { "cisco-openstack-mirror_folsom-proposed":
 	location => "ftp://ftpeng.cisco.com/openstack/cisco/",
 	release => "folsom-proposed",
 	repos => "main",
 	key => "E8CC67053ED3B199",
-	key_server => "pgpkeys.mit.edu"
+	key_server => "pgpkeys.mit.edu",
+	proxy => $::proxy,
 }
 
 ####### shared variables ##################
@@ -290,8 +289,9 @@ class { 'graphite':
 
 
 # set up a local apt cache.  Eventually this may become a local mirror/repo instead
-  class { apt-cacher-ng:
-    }
+  class { apt-cacher-ng: 
+  	proxy => $::proxy,
+  }
 
 # set the right local puppet environment up.  This builds puppetmaster with storedconfigs (a nd a local mysql instance)
   class { puppet:
