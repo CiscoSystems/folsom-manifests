@@ -61,11 +61,12 @@ true
 # The following are node definitions that will allow cobbler to PXE boot the hypervisor OS onto the system (based on the preseed built above)
 # You will want to adjust the "title" (maps to system name in cobbler), mac address (this is the PXEboot MAC target), IP (this is a static DHCP delivered address for this particular node), domain (added to /etc/resolv.conf for proper function), power address, the same one for power-strip based power control, per-node for IPMI/CIMC/ILO based control, power-ID needs to map to power port or service profile name (in UCSM based deployements)
 
-cobbler::node { "control":
+cobbler::node { "control01":
  mac => "00:10:18:65:C9:BC",
  profile => "precise-x86_64-auto",
  ip => "192.168.150.11",
  domain => "cisco.openstack.com",
+ node_type => "control",
  preseed => "cisco-preseed",
  power_address=>"172.20.231.46",
  power_type => "ipmitool",
@@ -79,6 +80,7 @@ cobbler::node { "compute01":
  profile => "precise-x86_64-auto",
  ip => "192.168.150.12",
  domain => "cisco.openstack.com",
+ node_type => "compute",
  preseed => "cisco-preseed",
  power_address => "172.20.231.47",
  power_type => "ipmitool",
