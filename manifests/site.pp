@@ -3,10 +3,6 @@
 # In this scenario Quantum is using OVS plugin and Swift
 # is not being used. 
 
-# Switch this to false after your first run to prevent unsafe operations
-# from potentially running again
-$initial_setup           = true
-
 # deploy a script that can be used to test nova
 class { 'openstack::test_file': }
 
@@ -268,7 +264,8 @@ class { 'collectd':
 
 }
 
-node /$build_node_fqdn/ inherits "cobbler-node" {
+#INSERT PROPER BUILD NODE FQDN
+node /build-node/ inherits "cobbler-node" {
  
 #change the servers for your NTP environment
   class { ntp:
