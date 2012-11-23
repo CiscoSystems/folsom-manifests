@@ -54,6 +54,8 @@ $rabbit_password         = 'openstack_rabbit_password'
 $rabbit_user             = 'openstack_rabbit_user'
 $fixed_network_range     = '10.4.0.0/24'
 $floating_ip_range       = '192.168.150.200/32'
+# NTP Server address, must be reachable at least by the build node.
+$ntp_address             = '192.168.150.1'
 # switch this to true to have all service log at verbose
 $verbose                 = false
 # by default it does not enable atomatically adding floating IPs
