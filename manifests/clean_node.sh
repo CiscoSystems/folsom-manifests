@@ -3,7 +3,7 @@
 # Execute the script by path/to/script/clean_node.sh <cobbler_system_name>.  You can get the name from cobbler system list command.
 if [[ -n $2 ]]
   then domain=$2
-  else domain="cisco.openstack.com"
+  else domain="ctocllab.cisco.com"
 fi
 sudo cobbler system edit --name=$1 --netboot-enable=Y
 sudo cobbler system poweroff --name=$1

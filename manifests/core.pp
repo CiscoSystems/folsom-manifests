@@ -3,6 +3,9 @@
 # In this scenario Quantum is using OVS with GRE Tunnels
 # Swift is not included.
 
+node base inherits "cobbler-node" {
+
+
 # Deploy a script that can be used to test nova
 class { 'openstack::test_file': }
 
@@ -19,8 +22,8 @@ apt::source { "cisco-openstack-mirror_folsom-proposed":
 
 
 # /etc/hosts entries for the controller nodes
-host { $controller_hostname:
-  ip => $controller_node_internal
+host { $::controller_hostname:
+  ip => $::controller_node_internal
 }
 ####
 # Active and passive nodes are mostly configured identically.
@@ -29,6 +32,7 @@ host { $controller_hostname:
 # $ha_primary is set to true on openstack_admin::controller::ha
 ####
 
+}
 
 #Common configuration for all node compute, controller, storage but puppet-master/cobbler
 node ntp {
@@ -39,10 +43,13 @@ node ntp {
   }
 }
 
+
+
+
 node /control/ {
 
 class { 'collectd':
-        graphitehost => "${build_node_fqdn}",
+        graphitehost => $::build_node_fqdn,
 }
 
   class { 'openstack::controller':
@@ -215,11 +222,11 @@ class { 'collectd':
 # Definition of this node should match the name assigned to the build node in your deployment.
 # In this example we are using build-node, you dont need to use the FQDN. 
 #
-node /build-node/ inherits "cobbler-node" {
+node /build-node/ inherits "base" {
  
 #change the servers for your NTP environment
 class { ntp:
-    servers => [ "${ntp_address}"],
+    servers => [$::build_node_fqdn],
     ensure => running,
     autoupdate => true,
   }
@@ -228,11 +235,11 @@ class { 'nagios':
     }
 
 class { 'collectd': 
-	graphitehost => "${build_node_fqdn}", 
+	graphitehost => $::build_node_fqdn, 
     }
 
 class { 'graphite': 
-	graphitehost => "${build_node_fqdn}",
+	graphitehost => $::build_node_fqdn,
 }
 
 # set up a local apt cache.  Eventually this may become a local mirror/repo instead
@@ -283,7 +290,4 @@ class { puppet:
 ',
   }
 
-}
-node default {
-  notify{"Default Node: Perhaps add a node definition to site.pp": }
 }
