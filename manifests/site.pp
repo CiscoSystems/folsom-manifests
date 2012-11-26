@@ -9,10 +9,14 @@ $initial_setup           = true
 
 ########### Proxy Configuration ##########
 # If you use an HTTP/HTTPS proxy, point this at its URL.
-$proxy	= false
+$proxy			= "http://proxy-rtp-1.cisco.com:8080"
+#$proxy	= false
       
 ########### Build Node (Cobbler, Puppet Master, NTP) ######
 $build_node_fqdn        = "build-node.ctocllab.cisco.com"
+
+########### NTP Configuration ############
+$company_ntp_server	= "ntp.esl.cisco.com"
 
 ########### Cobbler Variables ############
 $cobbler_node_ip = '172.29.74.196'
@@ -65,9 +69,6 @@ $floating_ip_range       = '192.168.150.200/32'
 # Nova DB connection
 $sql_connection = "mysql://${nova_user}:${nova_db_password}@${controller_node_address}/nova"
 # Switch this to true to have all service log at verbose
-# NTP Server address, must be reachable at least by the build node.
-$ntp_address             = '192.168.150.1'
-# switch this to true to have all service log at verbose
 $verbose                 = false
 # by default it does not enable atomatically adding floating IPs
 $auto_assign_floating_ip = false

@@ -3,7 +3,7 @@
 # In this scenario Quantum is using OVS with GRE Tunnels
 # Swift is not included.
 
-node base inherits "cobbler-node" {
+node base {
 
 
 # Deploy a script that can be used to test nova
@@ -11,6 +11,7 @@ class { 'openstack::test_file': }
 
 ########### Folsom Release ###############
 # Load apt prerequisites.  This is only valid on Ubuntu systmes
+
 apt::source { "cisco-openstack-mirror_folsom-proposed":
 	location => "ftp://ftpeng.cisco.com/openstack/cisco/",
 	release => "folsom-proposed",
@@ -34,19 +35,7 @@ host { $::controller_hostname:
 
 }
 
-#Common configuration for all node compute, controller, storage but puppet-master/cobbler
-node ntp {
- class { ntp:
-    servers => [ "${ntp_address}" ],
-    ensure => running,
-    autoupdate => true,
-  }
-}
-
-
-
-
-node /control/ {
+node /control/ inherits "base" {
 
 class { 'collectd':
         graphitehost => $::build_node_fqdn,
@@ -222,11 +211,12 @@ class { 'collectd':
 # Definition of this node should match the name assigned to the build node in your deployment.
 # In this example we are using build-node, you dont need to use the FQDN. 
 #
-node /build-node/ inherits "base" {
+node /build-node/ inherits "cobbler-node" {
  
-#change the servers for your NTP environment
+# Change the servers for your NTP environment
+# (Must be a reachable NTP Server by your build-node, i.e. ntp.esl.cisco.com)
 class { ntp:
-    servers => [$::build_node_fqdn],
+    servers => [$::company_ntp_server],
     ensure => running,
     autoupdate => true,
   }
