@@ -1,10 +1,6 @@
 # A node definition for cobbler
 # You will likely also want to change the IP addresses, domain name, and perhaps
 # even the proxy address
-# Default user is: localadmin
-# An example MD5 crypted password is "ubuntu": $6$UfgWxrIv$k4KfzAEMqMg.fppmSOTd0usI4j6gfjs0962.JXsoJRWa5wMz8yQk4SfInn4.WZ3L/MCt5u.62tHDGB36EhiKF1
-# which is used by the cobbler preseed file to set up the default admin user.
-
 
 node /cobbler-node/ inherits "base" {
 
@@ -47,30 +43,35 @@ cobbler::node { "p5-compute01":
 
 # Repeat as necessary.
 
+###### Nothing needs to be manually edited from this point ######
+
+
 ####### Shared Variables from Site.pp #######
 $cobbler_node_ip = $::build_node_fqdn
-notify{"inside cobbler-node  clobber_ip: ${cobbler_node_ip}": }
+$BUILD-NODE = $::build_node_fqdn
+$ETHER_VLAN = $::Ether_vlan
+$ETHERNET = $::Ethernet
 
 ####### Preseed File Configuration #######
-# This will build a preseed file called 'cisco-preseed' in /etc/cobbler/preseeds/
-# The following variables may be changed by the system admin:
-# 1) admin_user
-# 2) password_crypted
-# 3) late_command (Must Replace "BUILD-NODE-FQDN" with the corresponding value)
  cobbler::ubuntu::preseed { "cisco-preseed":
-  admin_user => "localadmin",
-  password_crypted => '$6$5NP1.NbW$WOXi0W1eXf9GOc0uThT5pBNZHqDH9JNczVjt9nzFsH7IkJdkUpLeuvBU.Zs9x3P6LBGKQh6b0zuR8XSlmcuGn.',
-  packages => "openssh-server vim ntp puppet",
+  admin_user => $::admin_user,
+  password_crypted => $::password_crypted,
+  packages => "openssh-server vim vlan lvm2 ntp puppet",
   ntp_server => $::build_node_fqdn,
-  late_command => '
-sed -e "/logdir/ a pluginsync=true" -i /target/etc/puppet/puppet.conf ; \
-sed -e "/logdir/ a server=build-node.ctocllab.cisco.com" -i /target/etc/puppet/puppet.conf ; \
-sed -e "s/START=no/START=yes/" -i /target/etc/default/puppet ; \
-echo -e "server build-node.ctocllab.cisco.com iburst" > /target/etc/ntp.conf ; \
-echo "8021q" >> /target/etc/modules ; \
-echo -e "# Private Interface\nauto eth0.40\niface eth0.40 inet manual\n\tvlan-raw-device eth0\n\tup ifconfig eth0.40 0.0.0.0 up\n" >> /target/etc/network/interfaces ; \
+late_command => "
+sed -e '/logdir/ a pluginsync=true' -i /target/etc/puppet/puppet.conf ; \
+sed -e \"/logdir/ a server=$BUILD-NODE\" -i /target/etc/puppet/puppet.conf ; \
+sed -e 's/START=no/START=yes/' -i /target/etc/default/puppet ; \
+echo -e \"server $BUILD-NODE iburst\" > /target/etc/ntp.conf ; \
+echo '8021q' >> /target/etc/modules ; \
+echo \"# Private Interface\" >> /target/etc/network/interfaces ;\
+echo \"auto $ETHER_VLAN\" >> /target/etc/network/interfaces ;\
+echo \"iface $ETHER_VLAN inet manual\" >> /target/etc/network/interfaces ;\
+echo \"      vlan-raw-device $ETHERNET\" >> /target/etc/network/interfaces ;\
+echo \"      up ifconfig $ETHER_VLAN 0.0.0.0 up\" >> /target/etc/network/interfaces ; \
+echo \" \" >> /target/etc/network/interfaces ; \
 true
-',
+",
   proxy => "http://${cobbler_node_ip}:3142/",
   expert_disk => true,
   diskpart => ['/dev/sdc'],

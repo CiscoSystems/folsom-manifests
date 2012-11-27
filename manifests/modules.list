@@ -4,7 +4,10 @@ apt-cacher-ng
 cobbler
 collectd
 concat
+corosync
+create_resources
 dnsmasq
+drbd
 glance
 graphite
 horizon

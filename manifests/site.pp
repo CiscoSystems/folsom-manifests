@@ -27,7 +27,16 @@ $dhcp_ip_low = '172.29.74.194'
 $dhcp_ip_high = '172.29.74.205'
 $domain_name = 'ctocllab.cisco.com'
 $cobbler_proxy = "http://${cobbler_node_ip}:3142/"
-$password_crypted = "$6$UfgWxrIv$k4KfzAEMqMg.fppmSOTd0usI4j6gfjs0962.JXsoJRWa5wMz8yQk4SfInn4.WZ3L/MCt5u.62tHDGB36EhiKF1"
+
+####### Preseed File Configuration #######
+# This will build a preseed file called 'cisco-preseed' in /etc/cobbler/preseeds/
+# The following variables may be changed by the system admin:
+# 1) admin_user
+# 2) password_crypted
+# Default user is: localadmin
+# An example MD5 crypted password is "ubuntu": $6$UfgWxrIv$k4KfzAEMqMg.fppmSOTd0usI4j6gfjs0962.JXsoJRWa5wMz8yQk4SfInn4.WZ3L/MCt5u.62tHDGB36EhiKF1
+$admin_user = "localadmin"
+$password_crypted = "$6$5NP1.NbW$WOXi0W1eXf9GOc0uThT5pBNZHqDH9JNczVjt9nzFsH7IkJdkUpLeuvBU.Zs9x3P6LBGKQh6b0zuR8XSlmcuGn."
 
 ### Advanced Users Configuration ###
 $node_dns = "${cobbler_node_ip}"
@@ -50,6 +59,10 @@ $multi_host		= true
 # This is also node as the Management Interface
 $public_interface        = 'eth0'
 $private_interface       = 'eth0.40'
+
+# Interfaces used for management traffic and inter-vms
+$Ethernet = 'eth0'
+$Ether_vlan = 'eth0.40'
 
 # OpenStack Services Credentials
 $admin_email             = 'root@localhost'
