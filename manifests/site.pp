@@ -35,8 +35,8 @@ $cobbler_proxy = "http://${cobbler_node_ip}:3142/"
 # 2) password_crypted
 # Default user is: localadmin
 # An example MD5 crypted password is "ubuntu": $6$UfgWxrIv$k4KfzAEMqMg.fppmSOTd0usI4j6gfjs0962.JXsoJRWa5wMz8yQk4SfInn4.WZ3L/MCt5u.62tHDGB36EhiKF1
-$admin_user = "localadmin"
-$password_crypted = "$6$5NP1.NbW$WOXi0W1eXf9GOc0uThT5pBNZHqDH9JNczVjt9nzFsH7IkJdkUpLeuvBU.Zs9x3P6LBGKQh6b0zuR8XSlmcuGn."
+$admin_user = 'localadmin'
+$password_crypted = '$6$UfgWxrIv$k4KfzAEMqMg.fppmSOTd0usI4j6gfjs0962.JXsoJRWa5wMz8yQk4SfInn4.WZ3L/MCt5u.62tHDGB36EhiKF1'
 
 ### Advanced Users Configuration ###
 $node_dns = "${cobbler_node_ip}"
