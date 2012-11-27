@@ -47,9 +47,9 @@ $dhcp_service = "dnsmasq"
 
 ########### OpenStack Variables ############
 # The address services will attempt to connect to the controller with
-$controller_node_address       = '192.168.150.11'
-$controller_node_network       = '192.168.150.0'
-$controller_hostname           = 'control'
+$controller_node_address       = '172.29.74.194'
+$controller_node_network       = '172.29.74.0'
+$controller_hostname           = 'p5-control01'
 $controller_node_public        = $controller_node_address
 $controller_node_internal      = $controller_node_address
 
@@ -78,7 +78,7 @@ $glance_on_swift         = false
 $rabbit_password         = 'openstack_rabbit_password'
 $rabbit_user             = 'openstack_rabbit_user'
 #$fixed_network_range     = '10.0.0.0/24'
-$floating_ip_range       = '192.168.150.200/32'
+$floating_ip_range       = '172.29.74.254/32'
 # Nova DB connection
 $sql_connection = "mysql://${nova_user}:${nova_db_password}@${controller_node_address}/nova"
 # Switch this to true to have all service log at verbose

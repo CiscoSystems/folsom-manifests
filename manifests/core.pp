@@ -101,7 +101,7 @@ class { 'collectd':
     quantum_db_name        	 => 'quantum',
     quantum_db_user          	 => 'quantum',
     quantum_db_host          	 => $controller_node_address,
-    quantum_db_allowed_hosts 	 => ['localhost','192.168.150.%'],
+    quantum_db_allowed_hosts 	 => ['localhost','172.29.74.%'],
     quantum_db_charset       	 => 'latin1',
     quantum_db_cluster_id    	 => 'localzone',
     quantum_email              	 => "quantum@${controller_node_address}",
@@ -131,7 +131,7 @@ class { 'collectd':
 }
 
 
-node /compute0/ inherits compute_base {
+node /compute0/ inherits "base" {
 
   class { 'openstack::auth_file':
     admin_password       => $admin_password,
