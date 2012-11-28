@@ -68,6 +68,7 @@ class { 'collectd':
     export_resources        => false,
 
     ######### quantum variables #############
+    quantum_enabled		 => true,
     quantum_url             	 => "http://${controller_node_address}:9696",
     quantum_admin_tenant_name    => 'services',
     quantum_admin_username       => 'quantum',
@@ -85,7 +86,7 @@ class { 'collectd':
     quantum_rabbit_virtual_host  => "/quantum",
     quantum_control_exchange     => "quantum",
     quantum_core_plugin          => "quantum.plugins.openvswitch.ovs_quantum_plugin.OVSQuantumPluginV2",
-    ovs_bridge_uplinks      	 => ['br-ex:eth1'],
+    ovs_bridge_uplinks      	 => ['br-ex:${external_interface}'],
     ovs_bridge_mappings          => ['default:br-ex'],
     ovs_tenant_network_type  	 => "gre",
     ovs_network_vlan_ranges  	 => "default:1000:2000",
@@ -163,6 +164,7 @@ class { 'collectd':
     manage_volumes     => true,
     nova_volume        => 'nova-volumes',
     # quantum config
+    quantum_enabled			=> false,
     quantum_url             	 	=> "http://${controller_node_address}:9696",
     quantum_admin_tenant_name    	=> 'services',
     quantum_admin_username       	=> 'quantum',
@@ -189,7 +191,7 @@ class { 'collectd':
     quantum_mac_generation_retries 	=> 16,
     quantum_dhcp_lease_duration    	=> 120,
     #quantum ovs
-    ovs_bridge_uplinks      		=> ['br-ex:eth1'],
+    ovs_bridge_uplinks      		=> ['br-ex:${external_interface}'],
     ovs_bridge_mappings      		=> ['default:br-ex'],
     ovs_tenant_network_type  		=> "gre",
     ovs_network_vlan_ranges  		=> "default:1000:2000",
@@ -211,8 +213,10 @@ class { 'collectd':
 # Definition of this node should match the name assigned to the build node in your deployment.
 # In this example we are using build-node, you dont need to use the FQDN. 
 #
+#$clientcert = $::clientcert
+
 node /build-node/ inherits "cobbler-node" {
- 
+
 # Change the servers for your NTP environment
 # (Must be a reachable NTP Server by your build-node, i.e. ntp.esl.cisco.com)
 class { ntp:

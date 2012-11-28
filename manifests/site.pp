@@ -55,14 +55,13 @@ $controller_node_internal      = $controller_node_address
 
 $multi_host		= true
 
-# Assumes that eth0 is the public interface
+# Assumes that eth0 is the API Interface
 # This is also node as the Management Interface
 $public_interface        = 'eth0'
+# This is used for Data Traffic between VMs
 $private_interface       = 'eth0.40'
-
-# Interfaces used for management traffic and inter-vms
-$Ethernet = 'eth0'
-$Ether_vlan = 'eth0.40'
+# This is use for external connectivity such as floating IPs (only in network/controller node)
+$external_interface	 = 'eth1'
 
 # OpenStack Services Credentials
 $admin_email             = 'root@localhost'

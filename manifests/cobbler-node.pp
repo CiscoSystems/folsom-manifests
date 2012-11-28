@@ -49,8 +49,8 @@ cobbler::node { "p5-compute01":
 ####### Shared Variables from Site.pp #######
 $cobbler_node_ip = $::build_node_fqdn
 $BUILD-NODE = $::build_node_fqdn
-$ETHER_VLAN = $::Ether_vlan
-$ETHERNET = $::Ethernet
+$ETHER_VLAN = $::private_interface
+$ETHERNET = $::public_interface
 
 ####### Preseed File Configuration #######
  cobbler::ubuntu::preseed { "cisco-preseed":
