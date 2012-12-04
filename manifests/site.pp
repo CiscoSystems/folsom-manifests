@@ -53,13 +53,16 @@ $controller_hostname           = 'p5-control01'
 $controller_node_public        = $controller_node_address
 $controller_node_internal      = $controller_node_address
 
-$multi_host		= true
+# Quantum does not support (Folsom) multi_host feature. This should be
+# false to avoid running nova-network on compute nodes.
+$multi_host		= false
 
 # Assumes that eth0 is the API Interface
 # This is also node as the Management Interface
 $public_interface        = 'eth0'
-# This is used for Data Traffic between VMs
-$private_interface       = 'eth0.40'
+# Interface used for vm networking connectivity when nova-network is being used.
+# Quantum does not required this value, eth0 as default value will be fine. 
+$private_interface	= 'eth0'
 # This is use for external connectivity such as floating IPs (only in network/controller node)
 $external_interface	 = 'eth1'
 
@@ -80,6 +83,7 @@ $rabbit_user             = 'openstack_rabbit_user'
 $floating_ip_range       = '172.29.74.254/32'
 # Nova DB connection
 $sql_connection = "mysql://${nova_user}:${nova_db_password}@${controller_node_address}/nova"
+$glance_sql_connection = "mysql://${nova_user}:${glance_db_password}@${controller_node_address}/glance"
 # Switch this to true to have all service log at verbose
 $verbose                 = false
 # by default it does not enable atomatically adding floating IPs
@@ -89,3 +93,41 @@ $auto_assign_floating_ip = false
 ####### Adding Core Configuration and Cobbler Nodes Definition #####
 import 'cobbler-node'
 import 'core'
+
+node /build-node/ inherits master-node {
+cobbler::node { "p5-control01":
+ mac => "A4:4C:11:13:98:4F",
+ ip => "172.29.74.194",
+ ### UCS CIMC Details ###
+ power_address => "172.29.74.170",
+ power_user => "admin",
+ power_password => "password",
+ power_type => "ipmitool",
+ ### Advanced Users Configuration ###
+ profile => "precise-x86_64-auto",
+ domain => $::domain_name,
+ node_type => "control",
+ preseed => "cisco-preseed",
+ }
+
+
+cobbler::node { "p5-compute01":
+ mac => "A4:4C:11:13:56:74",
+ ip => "172.29.74.197",
+ ### UCS CIMC Details ###
+ power_address => "172.29.74.173",
+ power_user => "admin",
+ power_password => "password",
+ power_type => "ipmitool",
+ ### Advanced Users Configuration ###
+ profile => "precise-x86_64-auto",
+ domain => $::domain_name,
+ node_type => "compute",
+ preseed => "cisco-preseed",
+ }
+
+### Repeat as needed ###
+}
+node p5-control01 inherits control { }
+node p5-compute01 inherits compute { }
+### Repeat as needed ###
