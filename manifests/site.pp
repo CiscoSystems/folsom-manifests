@@ -49,6 +49,7 @@ $dhcp_service = "dnsmasq"
 # The address services will attempt to connect to the controller with
 $controller_node_address       = '172.29.74.194'
 $controller_node_network       = '172.29.74.0'
+$db_allowed_network            = '172.29.74.%'
 $controller_hostname           = 'p5-control01'
 $controller_node_public        = $controller_node_address
 $controller_node_internal      = $controller_node_address
@@ -80,6 +81,8 @@ $nova_db_password        = 'nova_pass'
 $nova_user_password      = 'nova_pass'
 $glance_db_password      = 'glance_pass'
 $glance_user_password    = 'glance_pass'
+$glance_sql_connection   = "mysql://glance:${glance_db_password}@${controller_node_address}/glance"
+$glance_host		 = "${controller_node_address}"
 $glance_on_swift         = false
 $rabbit_password         = 'openstack_rabbit_password'
 $rabbit_user             = 'openstack_rabbit_user'
