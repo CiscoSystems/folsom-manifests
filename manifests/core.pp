@@ -67,6 +67,7 @@ UcXHbA==
 
     class { 'collectd':
         graphitehost => $::build_node_fqdn,
+	management_interface => $::public_interface,
     }
 }
 
