@@ -66,6 +66,10 @@ $private_interface	= 'eth0'
 # This is use for external connectivity such as floating IPs (only in network/controller node)
 $external_interface	 = 'eth1'
 
+# Select the drive on which OpenStack will be installed. Current assumption is that
+# all machines will have the same device name targeted
+$install_drive           = '/dev/sdc'
+
 # OpenStack Services Credentials
 $admin_email             = 'root@localhost'
 $admin_password          = 'Cisco123'
