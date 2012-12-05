@@ -5,6 +5,19 @@
 
 node base {
     ########### Folsom Release ###############
+
+    # Disable pipelining to avoid unfortunate interactions between apt and
+    # upstream network gear that does not properly handle http pipelining
+    # See https://bugs.launchpad.net/ubuntu/+source/apt/+bug/996151 for details
+
+    file { '/etc/apt/apt.conf.d/00no_pipelining':
+        ensure  => file,
+        owner   => 'root',
+        group   => 'root',
+        mode    => '0644',
+        content => 'Acquire::http::Pipeline-Depth "0";'
+    }
+
     # Load apt prerequisites.  This is only valid on Ubuntu systmes
 
     apt::source { "cisco-openstack-mirror_folsom-proposed":
