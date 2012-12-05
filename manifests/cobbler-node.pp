@@ -25,8 +25,8 @@ true
 ",
   proxy => "http://${cobbler_node_ip}:3142/",
   expert_disk => true,
-  diskpart => ['/dev/sdc'],
-  boot_disk => '/dev/sdc',
+  diskpart => [$::install_drive],
+  boot_disk => $::install_drive,
  }
 
 
