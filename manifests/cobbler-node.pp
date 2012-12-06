@@ -6,43 +6,43 @@ node /cobbler-node/ inherits "base" {
 
 
 ####### Shared Variables from Site.pp #######
-$cobbler_node_ip = $::build_node_fqdn
-$BUILD-NODE = $::build_node_fqdn
+$cobbler_node_ip 	= $::build_node_fqdn
+$BUILD-NODE 		= $::build_node_fqdn
 
 ####### Preseed File Configuration #######
  cobbler::ubuntu::preseed { "cisco-preseed":
-  admin_user => $::admin_user,
-  password_crypted => $::password_crypted,
-  packages => "openssh-server vim lvm2 ntp puppet",
-  ntp_server => $::build_node_fqdn,
-late_command => "
-sed -e '/logdir/ a pluginsync=true' -i /target/etc/puppet/puppet.conf ; \
-sed -e \"/logdir/ a server=$BUILD-NODE\" -i /target/etc/puppet/puppet.conf ; \
-sed -e 's/START=no/START=yes/' -i /target/etc/default/puppet ; \
-echo -e \"server $BUILD-NODE iburst\" > /target/etc/ntp.conf ; \
-echo '8021q' >> /target/etc/modules ; \
-true
-",
-  proxy => "http://${cobbler_node_ip}:3142/",
-  expert_disk => true,
-  diskpart => [$::install_drive],
-  boot_disk => $::install_drive,
+  admin_user 		=> $::admin_user,
+  password_crypted 	=> $::password_crypted,
+  packages 		=> "openssh-server vim lvm2 ntp puppet",
+  ntp_server 		=> $::build_node_fqdn,
+  late_command 		=> "
+	sed -e '/logdir/ a pluginsync=true' -i /target/etc/puppet/puppet.conf ; \
+	sed -e \"/logdir/ a server=$BUILD-NODE\" -i /target/etc/puppet/puppet.conf ; \
+	sed -e 's/START=no/START=yes/' -i /target/etc/default/puppet ; \
+	echo -e \"server $BUILD-NODE iburst\" > /target/etc/ntp.conf ; \
+	echo '8021q' >> /target/etc/modules ; \
+	true
+	",
+  proxy 		=> "http://${cobbler_node_ip}:3142/",
+  expert_disk 		=> true,
+  diskpart 		=> [$::install_drive],
+  boot_disk 		=> $::install_drive,
  }
 
 
 class { cobbler: 
-  node_subnet => $::node_subnet, 
-  node_netmask => $::node_netmask,
-  node_gateway => $::node_gateway,
-  node_dns => $::node_dns,
-  ip => $::ip,
-  dns_service => $::dns_service,
-  dhcp_service => $::dhcp_service,
-  dhcp_ip_low => $::dhcp_ip_low,
-  dhcp_ip_high => $::dhcp_ip_high, 
-  domain_name => $::domain_name,
-  proxy => $::cobbler_proxy,
-  password_crypted => $::password_crypted,
+  node_subnet 		=> $::node_subnet, 
+  node_netmask 		=> $::node_netmask,
+  node_gateway 		=> $::node_gateway,
+  node_dns 		=> $::node_dns,
+  ip 			=> $::ip,
+  dns_service 		=> $::dns_service,
+  dhcp_service 		=> $::dhcp_service,
+  dhcp_ip_low 		=> $::dhcp_ip_low,
+  dhcp_ip_high 		=> $::dhcp_ip_high, 
+  domain_name 		=> $::domain_name,
+  proxy 		=> $::cobbler_proxy,
+  password_crypted 	=> $::password_crypted,
 }
 
 # This will load the Ubuntu Server OS into cobbler

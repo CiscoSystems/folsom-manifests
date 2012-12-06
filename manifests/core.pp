@@ -66,17 +66,17 @@ UcXHbA==
     }
 
     class { 'collectd':
-        graphitehost => $::build_node_fqdn,
-	management_interface => $::public_interface,
+        graphitehost		=> $::build_node_fqdn,
+	management_interface	=> $::public_interface,
     }
 }
 
 node os_base inherits base {
 
     class { ntp:
-	servers => [$::build_node_fqdn],
-	ensure => running,
-	autoupdate => true,
+	servers		=> [$::build_node_fqdn],
+	ensure 		=> running,
+	autoupdate 	=> true,
     }
 
     # Deploy a script that can be used to test nova
@@ -121,61 +121,60 @@ node control inherits "os_base" {
 	export_resources        => false,
 
 	######### quantum variables #############
-	quantum_enabled		 => true,
-	quantum_url             	 => "http://${controller_node_address}:9696",
-	quantum_admin_tenant_name    => 'services',
-	quantum_admin_username       => 'quantum',
-	quantum_admin_password       => 'quantum',
-	quantum_admin_auth_url       => "http://${controller_node_address}:35357/v2.0",
-	libvirt_vif_driver      	 => 'nova.virt.libvirt.vif.LibvirtHybirdOVSBridgeDriver',
-	host         		 => 'controller',
-	quantum_sql_connection       => "mysql://quantum:quantum@${controller_node_address}/quantum",
-	quantum_auth_host            => "${controller_node_address}",
-	quantum_auth_port            => "35357",
-	quantum_rabbit_host          => "${controller_node_address}",
-	quantum_rabbit_port          => "5672",
-	quantum_rabbit_user          => "quantum",
-	quantum_rabbit_password      => "quantum",
-	quantum_rabbit_virtual_host  => "/quantum",
-	quantum_control_exchange     => "quantum",
-	quantum_core_plugin          => "quantum.plugins.openvswitch.ovs_quantum_plugin.OVSQuantumPluginV2",
-	ovs_bridge_uplinks      	 => ["br-ex:${external_interface}"],
-	ovs_bridge_mappings          => ['default:br-ex'],
-	ovs_tenant_network_type  	 => "gre",
-	ovs_network_vlan_ranges  	 => "default:1000:2000",
-	ovs_integration_bridge   	 => "br-int",
-	ovs_enable_tunneling    	 => "True",
-	ovs_tunnel_bridge        	 => "br-tun",
-	ovs_tunnel_id_ranges     	 => "1:1000",
-	ovs_local_ip             	 => $ipaddress_eth0,
-	ovs_server               	 => false,
-	ovs_root_helper          	 => "sudo quantum-rootwrap /etc/quantum/rootwrap.conf",
-	ovs_sql_connection       	 => "mysql://quantum:quantum@${controller_node_address}/quantum",
-	quantum_db_password      	 => "quantum",
-	quantum_db_name        	 => 'quantum',
-	quantum_db_user          	 => 'quantum',
-	quantum_db_host          	 => $controller_node_address,
-	quantum_db_allowed_hosts 	 => ['localhost', , "${db_allowed_network}"],
-	quantum_db_charset       	 => 'latin1',
-	quantum_db_cluster_id    	 => 'localzone',
-	quantum_email              	 => "quantum@${controller_node_address}",
-	quantum_public_address       => "${controller_node_address}",
-	quantum_admin_address        => "${controller_node_address}",
-	quantum_internal_address     => "${controller_node_address}",
-	quantum_port                 => '9696',
-	quantum_region               => 'RegionOne',
-	l3_interface_driver          => "quantum.agent.linux.interface.OVSInterfaceDriver",
-	l3_use_namespaces            => "True",
-	l3_metadata_ip               => "169.254.169.254",
-	l3_external_network_bridge   => "br-ex",
-	l3_root_helper               => "sudo /usr/bin/quantum-rootwrap /etc/quantum/rootwrap.conf",
+	quantum_enabled			=> true,
+	quantum_url             	=> "http://${controller_node_address}:9696",
+	quantum_admin_tenant_name    	=> 'services',
+	quantum_admin_username       	=> 'quantum',
+	quantum_admin_password       	=> 'quantum',
+	quantum_admin_auth_url       	=> "http://${controller_node_address}:35357/v2.0",
+	libvirt_vif_driver      	=> 'nova.virt.libvirt.vif.LibvirtHybirdOVSBridgeDriver',
+	host         		 	=> 'controller',
+	quantum_sql_connection       	=> "mysql://quantum:quantum@${controller_node_address}/quantum",
+	quantum_auth_host            	=> "${controller_node_address}",
+	quantum_auth_port            	=> "35357",
+	quantum_rabbit_host          	=> "${controller_node_address}",
+	quantum_rabbit_port          	=> "5672",
+	quantum_rabbit_user          	=> "quantum",
+	quantum_rabbit_password      	=> "quantum",
+	quantum_rabbit_virtual_host  	=> "/quantum",
+	quantum_control_exchange     	=> "quantum",
+	quantum_core_plugin          	=> "quantum.plugins.openvswitch.ovs_quantum_plugin.OVSQuantumPluginV2",
+	ovs_bridge_uplinks      	=> ["br-ex:${external_interface}"],
+	ovs_bridge_mappings          	=> ['default:br-ex'],
+	ovs_tenant_network_type  	=> "gre",
+	ovs_network_vlan_ranges  	=> "default:1000:2000",
+	ovs_integration_bridge   	=> "br-int",
+	ovs_enable_tunneling    	=> "True",
+	ovs_tunnel_bridge         	=> "br-tun",
+	ovs_tunnel_id_ranges     	=> "1:1000",
+	ovs_local_ip             	=> $ipaddress_eth0,
+	ovs_server               	=> false,
+	ovs_root_helper          	=> "sudo quantum-rootwrap /etc/quantum/rootwrap.conf",
+	ovs_sql_connection       	=> "mysql://quantum:quantum@${controller_node_address}/quantum",
+	quantum_db_password      	=> "quantum",
+	quantum_db_name        	 	=> 'quantum',
+	quantum_db_user          	=> 'quantum',
+	quantum_db_host          	=> $controller_node_address,
+	quantum_db_allowed_hosts 	=> ['localhost', "${db_allowed_network}"],
+	quantum_db_charset       	=> 'latin1',
+	quantum_db_cluster_id    	=> 'localzone',
+	quantum_email              	=> "quantum@${controller_node_address}",
+	quantum_public_address       	=> "${controller_node_address}",
+	quantum_admin_address        	=> "${controller_node_address}",
+	quantum_internal_address     	=> "${controller_node_address}",
+	quantum_port                 	=> '9696',
+	quantum_region               	=> 'RegionOne',
+	l3_interface_driver          	=> "quantum.agent.linux.interface.OVSInterfaceDriver",
+	l3_use_namespaces            	=> "True",
+	l3_metadata_ip               	=> "169.254.169.254",
+	l3_external_network_bridge   	=> "br-ex",
+	l3_root_helper               	=> "sudo /usr/bin/quantum-rootwrap /etc/quantum/rootwrap.conf",
 	#quantum dhcp
-	dhcp_state_path         	 => "/var/lib/quantum",
-	dhcp_interface_driver   	 => "quantum.agent.linux.interface.OVSInterfaceDriver",
-	dhcp_driver        	 	 => "quantum.agent.linux.dhcp.Dnsmasq",
-	dhcp_use_namespaces     	 => "True",
+	dhcp_state_path         	=> "/var/lib/quantum",
+	dhcp_interface_driver   	=> "quantum.agent.linux.interface.OVSInterfaceDriver",
+	dhcp_driver        	 	=> "quantum.agent.linux.dhcp.Dnsmasq",
+	dhcp_use_namespaces     	=> "True",
     }
-
 }
 
 
@@ -202,7 +201,7 @@ node compute inherits "os_base" {
 	nova_volume        => 'nova-volumes',
 	# quantum config
 	quantum_enabled			=> false,
-	quantum_url             	 	=> "http://${controller_node_address}:9696",
+	quantum_url             	=> "http://${controller_node_address}:9696",
 	quantum_admin_tenant_name    	=> 'services',
 	quantum_admin_username       	=> 'quantum',
 	quantum_admin_password       	=> 'quantum',
@@ -228,20 +227,19 @@ node compute inherits "os_base" {
 	quantum_mac_generation_retries 	=> 16,
 	quantum_dhcp_lease_duration    	=> 120,
 	#quantum ovs
-	ovs_bridge_uplinks      		=> ["br-ex:${external_interface}"],
-	ovs_bridge_mappings      		=> ['default:br-ex'],
-	ovs_tenant_network_type  		=> "gre",
-	ovs_network_vlan_ranges  		=> "default:1000:2000",
-	ovs_integration_bridge   		=> "br-int",
-	ovs_enable_tunneling    		=> "True",
-	ovs_tunnel_bridge       	 	=> "br-tun",
-	ovs_tunnel_id_ranges     		=> "1:1000",
-	ovs_local_ip             		=> $ipaddress_eth0,
-	ovs_server               		=> false,
-	ovs_root_helper          		=> "sudo quantum-rootwrap /etc/quantum/rootwrap.conf",
-	ovs_sql_connection       		=> "mysql://quantum:quantum@${controller_node_address}/quantum",
+	ovs_bridge_uplinks      	=> ["br-ex:${external_interface}"],
+	ovs_bridge_mappings      	=> ['default:br-ex'],
+	ovs_tenant_network_type  	=> "gre",
+	ovs_network_vlan_ranges  	=> "default:1000:2000",
+	ovs_integration_bridge   	=> "br-int",
+	ovs_enable_tunneling    	=> "True",
+	ovs_tunnel_bridge       	=> "br-tun",
+	ovs_tunnel_id_ranges     	=> "1:1000",
+	ovs_local_ip             	=> $ipaddress_eth0,
+	ovs_server               	=> false,
+	ovs_root_helper          	=> "sudo quantum-rootwrap /etc/quantum/rootwrap.conf",
+	ovs_sql_connection       	=> "mysql://quantum:quantum@${controller_node_address}/quantum",
     }
-
 }
 
 
@@ -255,21 +253,21 @@ node master-node inherits "cobbler-node" {
     # Change the servers for your NTP environment
     # (Must be a reachable NTP Server by your build-node, i.e. ntp.esl.cisco.com)
     class { ntp:
-	servers => [$::company_ntp_server],
-	ensure => running,
-	autoupdate => true,
+	servers 	=> [$::company_ntp_server],
+	ensure 		=> running,
+	autoupdate 	=> true,
     }
 
     class { 'nagios':
     }
 
     class { 'graphite': 
-	graphitehost => $::build_node_fqdn,
+	graphitehost 	=> $::build_node_fqdn,
     }
 
     # set up a local apt cache.  Eventually this may become a local mirror/repo instead
     class { apt-cacher-ng: 
-  	proxy => $::proxy,
+  	proxy 		=> $::proxy,
     }
 
     # set the right local puppet environment up.  This builds puppetmaster with storedconfigs (a nd a local mysql instance)
