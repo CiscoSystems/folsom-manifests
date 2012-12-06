@@ -90,7 +90,6 @@ $rabbit_user             = 'openstack_rabbit_user'
 $floating_ip_range       = '172.29.74.254/32'
 # Nova DB connection
 $sql_connection = "mysql://${nova_user}:${nova_db_password}@${controller_node_address}/nova"
-$glance_sql_connection = "mysql://${nova_user}:${glance_db_password}@${controller_node_address}/glance"
 # Switch this to true to have all service log at verbose
 $verbose                 = false
 # by default it does not enable atomatically adding floating IPs
