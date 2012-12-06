@@ -155,7 +155,7 @@ node control inherits "os_base" {
 	quantum_db_name        	 => 'quantum',
 	quantum_db_user          	 => 'quantum',
 	quantum_db_host          	 => $controller_node_address,
-	quantum_db_allowed_hosts 	 => ['localhost', , "${db_allowed_network}"],
+	quantum_db_allowed_hosts 	 => ['localhost', "${db_allowed_network}"],
 	quantum_db_charset       	 => 'latin1',
 	quantum_db_cluster_id    	 => 'localzone',
 	quantum_email              	 => "quantum@${controller_node_address}",
