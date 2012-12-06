@@ -127,7 +127,7 @@ node control inherits "os_base" {
 	quantum_admin_username       	=> 'quantum',
 	quantum_admin_password       	=> 'quantum',
 	quantum_admin_auth_url       	=> "http://${controller_node_address}:35357/v2.0",
-	libvirt_vif_driver      	=> 'nova.virt.libvirt.vif.LibvirtHybirdOVSBridgeDriver',
+	libvirt_vif_driver      	=> 'nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver',
 	host         		 	=> 'controller',
 	quantum_sql_connection       	=> "mysql://quantum:quantum@${controller_node_address}/quantum",
 	quantum_auth_host            	=> "${controller_node_address}",
@@ -206,7 +206,7 @@ node compute inherits "os_base" {
 	quantum_admin_username       	=> 'quantum',
 	quantum_admin_password       	=> 'quantum',
 	quantum_admin_auth_url       	=> "http://${controller_node_address}:35357/v2.0",
-	libvirt_vif_driver      	=> 'nova.virt.libvirt.vif.LibvirtHybirdOVSBridgeDriver',
+	libvirt_vif_driver      	=> 'nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver',
 	libvirt_use_virtio_for_bridges  => 'True',
 	host        	 		=> 'compute',
 	#quantum general
