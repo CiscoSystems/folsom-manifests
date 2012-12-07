@@ -3,10 +3,6 @@
 # In this scenario Quantum is using OVS with GRE Tunnels
 # Swift is not included.
 
-# Switch this to false after your first run to prevent unsafe operations
-# from potentially running again
-$initial_setup          = true
-
 ########### Proxy Configuration ##########
 # If you use an HTTP/HTTPS proxy, point this at its URL.
 $proxy			= "http://proxy-rtp-1.cisco.com:8080"
