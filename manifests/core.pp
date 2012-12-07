@@ -166,7 +166,7 @@ node control inherits "os_base" {
 	quantum_region               	=> 'RegionOne',
 	l3_interface_driver          	=> "quantum.agent.linux.interface.OVSInterfaceDriver",
 	l3_use_namespaces            	=> "True",
-	l3_metadata_ip               	=> "169.254.169.254",
+	l3_metadata_ip               	=> "${controller_node_address}",
 	l3_external_network_bridge   	=> "br-ex",
 	l3_root_helper               	=> "sudo /usr/bin/quantum-rootwrap /etc/quantum/rootwrap.conf",
 	#quantum dhcp
