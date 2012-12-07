@@ -111,7 +111,6 @@ node control inherits "os_base" {
 	keystone_admin_token    => $keystone_admin_token,
 	glance_db_password      => $glance_db_password,
 	glance_user_password    => $glance_user_password,
-	glance_host		=> $glance_host,
         glance_sql_connection   => $glance_sql_connection,
         glance_on_swift         => $glance_on_swift,
 	nova_db_password        => $nova_db_password,
