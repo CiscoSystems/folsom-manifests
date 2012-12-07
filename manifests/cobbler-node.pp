@@ -13,7 +13,7 @@ $BUILD-NODE 		= $::build_node_fqdn
  cobbler::ubuntu::preseed { "cisco-preseed":
   admin_user 		=> $::admin_user,
   password_crypted 	=> $::password_crypted,
-  packages 		=> "openssh-server vim lvm2 ntp puppet",
+  packages 		=> "openssh-server vim vlan lvm2 ntp puppet",
   ntp_server 		=> $::build_node_fqdn,
   late_command 		=> "
 	sed -e '/logdir/ a pluginsync=true' -i /target/etc/puppet/puppet.conf ; \
