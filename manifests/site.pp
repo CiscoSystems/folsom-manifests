@@ -4,9 +4,9 @@
 # Swift is not included.
 
 ########### Proxy Configuration ##########
-# If you use an HTTP/HTTPS proxy, point this at its URL.
-$proxy			= "http://proxy-rtp-1.cisco.com:8080"
-#$proxy	= false
+# If you use an HTTP/HTTPS proxy, uncomment this setting and specify the correct proxy URL.
+# If you do not use an HTTP/HTTPS proxy, leave this setting commented out.
+#$proxy			= "http://proxy-server:port-number"
       
 ########### Build Node (Cobbler, Puppet Master, NTP) ######
 $build_node_fqdn        = "build-node.ctocllab.cisco.com"
