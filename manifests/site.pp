@@ -19,8 +19,6 @@ $cobbler_node_ip 	= '172.29.74.196'
 $node_subnet 		= '172.29.74.0'
 $node_netmask 		= '255.255.254.0'
 $node_gateway 		= '172.29.74.1'
-$dhcp_ip_low 		= '172.29.74.194'
-$dhcp_ip_high 		= '172.29.74.205'
 $domain_name 		= 'ctocllab.cisco.com'
 $cobbler_proxy 		= "http://${cobbler_node_ip}:3142/"
 

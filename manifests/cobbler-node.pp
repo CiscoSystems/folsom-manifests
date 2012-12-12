@@ -38,8 +38,6 @@ class { cobbler:
   ip 			=> $::ip,
   dns_service 		=> $::dns_service,
   dhcp_service 		=> $::dhcp_service,
-  dhcp_ip_low 		=> $::dhcp_ip_low,
-  dhcp_ip_high 		=> $::dhcp_ip_high, 
   domain_name 		=> $::domain_name,
   proxy 		=> $::cobbler_proxy,
   password_crypted 	=> $::password_crypted,
