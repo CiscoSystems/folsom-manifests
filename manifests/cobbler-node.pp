@@ -38,6 +38,9 @@ class { cobbler:
   ip 			=> $::ip,
   dns_service 		=> $::dns_service,
   dhcp_service 		=> $::dhcp_service,
+# change these two if a dynamic DHCP pool is needed
+  dhcp_ip_low           => false,
+  dhcp_ip_high          => false,
   domain_name 		=> $::domain_name,
   proxy 		=> $::cobbler_proxy,
   password_crypted 	=> $::password_crypted,
