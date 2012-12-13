@@ -1,0 +1,98 @@
+#!/bin/bash
+# build_os by Cisco Systems, Inc. is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+
+set -o errexit
+
+usage() {
+cat <<EOF
+usage: $0 options
+
+OPTIONS:
+  -h           Show this message
+  -p           http proxy i.e. -p http://username:password@host:port/
+EOF
+}
+
+function run_cmd () {
+  if [ -z "$PROXY" ]; then
+    sudo $*
+  else
+    sudo env http_proxy=$PROXY https_proxy=$PROXY $*
+  fi
+}
+
+APT_CONFIG="-o Acquire::http::No-Cache=True -o Acquire::BrokenProxy=true -o Acquire::Retries=3"
+
+if [ -n "$http_proxy" ]; then
+  if [ -z "$https_proxy" ]; then
+    echo "Please set https_proxy env variable."
+    exit 1
+  fi
+  PROXY=$http_proxy
+fi
+
+while getopts "h:p:" OPTION
+do
+  case $OPTION in
+    h)
+      usage
+      exit 1
+      ;;
+    p)
+      PROXY=$OPTARG
+      export http_proxy=$PROXY
+      export https_proxy=$PROXY
+  esac
+done
+
+echo -e "\n\nUpdate apt repository...\n\n"
+if ! run_cmd apt-get $APT_CONFIG update; then
+  echo "Can't update apt repository"
+  exit 1
+fi
+
+echo "Installing prerequisite apps: git, puppet, ipmitool, python-software-properties.."
+if ! run_cmd apt-get $APT_CONFIG install -qym git puppet ipmitool python-software-properties; then
+  echo "Can't install prerequisites!..."
+  exit 1
+fi
+
+echo "Cloning folsom-manifests multi-node repository branch from github.com..."
+if [ -d /root/cisco-folsom-manifests ] ; then
+	echo -e "Looks like perhaps you ran this script before? We'll try to update your os-docs directory, just in case..."
+	if ! run_cmd git --git-dir=/root/cisco-folsom-manifests/.git/ pull ; then
+	   echo "That did not work.  Perhaps rename your os-docs directory, and try again?"
+	   exit 1
+        fi
+fi
+
+if [ ! -d /root/cisco-folsom-manifests ] ; then
+	if ! run_cmd git clone -b multi-node https://github.com/CiscoSystems/folsom-manifests /root/cisco-folsom-manifests ; then
+ 	  echo "Can't run git clone!"
+	  exit 1
+	fi
+fi
+
+echo "Copying manifests examples to manifest dir..."
+if ! run_cmd cp /root/cisco-folsom-manifests/manifests/* /etc/puppet/manifests/ ;then
+  echo "Can't copy sample manifests!!!"
+  exit 1
+fi
+
+echo -e "\n\nUpdated apt repository...\n\n"
+if ! run_cmd apt-get $APT_CONFIG update; then
+  echo "Can't update apt repository"
+  exit 1
+fi
+
+cd /etc/puppet/manifests
+
+echo -e "\n\nInstalling Cisco Validated puppet openstack modules...\n\n"
+if ! run_cmd sh puppet-modules.sh ; then
+  echo "Can't install puppet  modules..."
+  exit 1
+fi
+
+echo -e "\n\nSUCCESS!!!!\n\n Now, go edit your site.pp file in /etc/puppet/manifests, and then run 'puppet apply -v /etc/puppet/manifests/site.pp"
+
+exit 0
