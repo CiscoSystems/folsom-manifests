@@ -3,6 +3,8 @@
 # In this scenario Quantum is using OVS with GRE Tunnels
 # Swift is not included.
 
+$build_node_fqdn = "${::build_node_name}.${::domain_name}"
+
 node base {
     ########### Folsom Release ###############
 
@@ -269,6 +271,9 @@ node master-node inherits "cobbler-node" {
     # set up a local apt cache.  Eventually this may become a local mirror/repo instead
     class { apt-cacher-ng: 
   	proxy 		=> $::proxy,
+	avoid_if_rangea => true, # Some proxies have issues with range headers
+                                 # this stops us attempting to use them
+                                 # msrginally less efficient with other proxies
     }
 
     # set the right local puppet environment up.  This builds puppetmaster with storedconfigs (a nd a local mysql instance)

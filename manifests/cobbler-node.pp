@@ -6,8 +6,7 @@ node /cobbler-node/ inherits "base" {
 
 
 ####### Shared Variables from Site.pp #######
-$cobbler_node_ip 	= $::build_node_fqdn
-$BUILD-NODE 		= $::build_node_fqdn
+$cobbler_node_fqdn 	        = "${::build_node_name}.${::domain_name}"
 
 ####### Preseed File Configuration #######
  cobbler::ubuntu::preseed { "cisco-preseed":
@@ -17,13 +16,13 @@ $BUILD-NODE 		= $::build_node_fqdn
   ntp_server 		=> $::build_node_fqdn,
   late_command 		=> "
 	sed -e '/logdir/ a pluginsync=true' -i /target/etc/puppet/puppet.conf ; \
-	sed -e \"/logdir/ a server=$BUILD-NODE\" -i /target/etc/puppet/puppet.conf ; \
+	sed -e \"/logdir/ a server=$cobbler_node_fqdn\" -i /target/etc/puppet/puppet.conf ; \
 	sed -e 's/START=no/START=yes/' -i /target/etc/default/puppet ; \
-	echo -e \"server $BUILD-NODE iburst\" > /target/etc/ntp.conf ; \
+	echo -e \"server $cobbler_node_fqdn iburst\" > /target/etc/ntp.conf ; \
 	echo '8021q' >> /target/etc/modules ; \
 	true
 	",
-  proxy 		=> "http://${cobbler_node_ip}:3142/",
+  proxy 		=> "http://${cobbler_node_fqdn}:3142/",
   expert_disk 		=> true,
   diskpart 		=> [$::install_drive],
   boot_disk 		=> $::install_drive,
@@ -49,5 +48,6 @@ class { cobbler:
 # This will load the Ubuntu Server OS into cobbler
 # COE supprts only Ubuntu precise x86_64
  cobbler::ubuntu { "precise":
+  proxy => $::proxy,
  }
 }
