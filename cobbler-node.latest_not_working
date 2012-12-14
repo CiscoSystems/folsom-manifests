@@ -29,6 +29,26 @@ $BUILD-NODE 		= $::build_node_fqdn
   boot_disk 		=> $::install_drive,
  }
 
+ cobbler::ubuntu::preseed { "controller-preseed":
+  admin_user            => $::admin_user,
+  password_crypted      => $::password_crypted,
+  packages              => "openssh-server vim vlan lvm2 ntp puppet",
+  ntp_server            => $::build_node_fqdn,
+  late_command          => "
+	sed -e '/logdir/ a pluginsync=true' -i /target/etc/puppet/puppet.conf ; \
+	sed -e '/logdir/ a server=build-os.dmz-pod2.lab' -i /target/etc/puppet/puppet.conf ; \
+	sed -e 's/START=no/START=yes/' -i /target/etc/default/puppet ; \
+	echo -e 'server build-os.dmz-pod2.lab iburst' > /target/etc/ntp.conf ; \
+	echo '8021q' >> /target/etc/modules ; \
+	echo -e '# Public Network Bridged Interface\nauto eth0.221\niface eth0.221 inet manual\n\tup ifconfig eth0.221 up\n\tup ip link set eth0.221 promisc on\n\tdown ifconfig eth0.221 down' >> /target/etc/network/interfaces ; \
+	true
+	",
+  proxy                 => "http://${cobbler_node_ip}:3142/",
+  expert_disk           => true,
+  diskpart              => [$::install_drive],
+  boot_disk             => $::install_drive,
+ }
+
 
 class { cobbler: 
   node_subnet 		=> $::node_subnet, 

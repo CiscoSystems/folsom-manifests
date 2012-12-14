@@ -9,19 +9,19 @@
 #$proxy			= "http://proxy-server:port-number"
       
 ########### Build Node (Cobbler, Puppet Master, NTP) ######
-$build_node_fqdn        = "build-node.ctocllab.cisco.com"
+$build_node_fqdn        = "build-os.dmz-pod2.lab"
 
 ########### NTP Configuration ############
-$company_ntp_server	= "ntp.esl.cisco.com"
+$company_ntp_server	= "192.168.220.1"
 
 ########### Cobbler Variables ############
-$cobbler_node_ip 	= '172.29.74.196'
-$node_subnet 		= '172.29.74.0'
-$node_netmask 		= '255.255.254.0'
-$node_gateway 		= '172.29.74.1'
-$dhcp_ip_low 		= '172.29.74.194'
-$dhcp_ip_high 		= '172.29.74.205'
-$domain_name 		= 'ctocllab.cisco.com'
+$cobbler_node_ip 	= '192.168.220.254'
+$node_subnet 		= '192.168.220.0'
+$node_netmask 		= '255.255.255.0'
+$node_gateway 		= '192.168.220.1'
+$dhcp_ip_low 		= '192.168.220.240'
+$dhcp_ip_high 		= '192.168.220.250'
+$domain_name 		= 'dmz-pod2.lab'
 $cobbler_proxy 		= "http://${cobbler_node_ip}:3142/"
 
 ####### Preseed File Configuration #######
@@ -43,10 +43,10 @@ $dhcp_service 	= "dnsmasq"
 
 ########### OpenStack Variables ############
 # The address services will attempt to connect to the controller with
-$controller_node_address       = '172.29.74.194'
-$controller_node_network       = '172.29.74.0'
-$db_allowed_network            = '172.29.74.%'
-$controller_hostname           = 'p5-control01'
+$controller_node_address       = '192.168.220.43'
+$controller_node_network       = '192.168.220.0'
+$db_allowed_network            = '192.168.220..%'
+$controller_hostname           = 'control03'
 $controller_node_public        = $controller_node_address
 $controller_node_internal      = $controller_node_address
 
@@ -61,7 +61,7 @@ $public_interface        	= 'eth0'
 # Quantum does not required this value, eth0 as default value will be fine. 
 $private_interface		= 'eth0'
 # This is use for external connectivity such as floating IPs (only in network/controller node)
-$external_interface	 	= 'eth1'
+$external_interface	 	= 'eth0.221'
 
 # Select the drive on which OpenStack will be installed. Current assumption is that
 # all machines will have the same device name targeted
@@ -81,25 +81,25 @@ $glance_sql_connection   = "mysql://glance:${glance_db_password}@${controller_no
 $glance_on_swift         = false
 $rabbit_password         = 'openstack_rabbit_password'
 $rabbit_user             = 'openstack_rabbit_user'
-$floating_ip_range       = '172.29.74.254/32'
+#$floating_ip_range       = '172.29.74.254/32'
 # Nova DB connection
 $sql_connection 	 = "mysql://${nova_user}:${nova_db_password}@${controller_node_address}/nova"
 # Switch this to true to have all service log at verbose
 $verbose                 = false
 # by default it does not enable atomatically adding floating IPs
-$auto_assign_floating_ip = false
+#$auto_assign_floating_ip = false
 #### end shared variables #################
 
 ####### Adding Core Configuration and Cobbler Nodes Definition #####
 import 'cobbler-node'
 import 'core'
 
-node /build-node/ inherits master-node {
-cobbler::node { "p5-control01":
- mac 		=> "A4:4C:11:13:98:4F",
- ip 		=> "172.29.74.194",
+node /build-os/ inherits master-node {
+cobbler::node { "control03":
+ mac 		=> "A4:4C:11:13:5E:5C",
+ ip 		=> "192.168.220.43",
  ### UCS CIMC Details ###
- power_address 	=> "172.29.74.170",
+ power_address 	=> "192.168.220.13",
  power_user 	=> "admin",
  power_password => "password",
  power_type 	=> "ipmitool",
@@ -107,15 +107,15 @@ cobbler::node { "p5-control01":
  profile 	=> "precise-x86_64-auto",
  domain 	=> $::domain_name,
  node_type 	=> "control",
- preseed 	=> "cisco-preseed",
+ preseed 	=> "controller-preseed",
  }
 
 
-cobbler::node { "p5-compute01":
- mac 		=> "A4:4C:11:13:56:74",
- ip 		=> "172.29.74.197",
+cobbler::node { "compute01":
+ mac 		=> "A4:4C:11:13:52:80",
+ ip 		=> "192.168.220.51",
  ### UCS CIMC Details ###
- power_address 	=> "172.29.74.173",
+ power_address 	=> "192.168.220.4",
  power_user 	=> "admin",
  power_password => "password",
  power_type 	=> "ipmitool",
@@ -128,6 +128,6 @@ cobbler::node { "p5-compute01":
 
 ### Repeat as needed ###
 }
-node p5-control01 inherits control { }
-node p5-compute01 inherits compute { }
+node control03 inherits control { }
+node compute01 inherits compute { }
 ### Repeat as needed ###

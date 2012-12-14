@@ -21,7 +21,8 @@ node base {
     # Load apt prerequisites.  This is only valid on Ubuntu systmes
 
     apt::source { "cisco-openstack-mirror_folsom-proposed":
-	location => "ftp://ftpeng.cisco.com/openstack/cisco/",
+	#location => "ftp://ftpeng.cisco.com/openstack/cisco/",
+        location => "http://128.107.252.163/openstack/cisco",
 	release => "folsom-proposed",
 	repos => "main",
 	key => "E8CC67053ED3B199",
@@ -65,10 +66,10 @@ UcXHbA==
 	ip => $::controller_node_internal
     }
 
-    class { 'collectd':
-        graphitehost		=> $::build_node_fqdn,
-	management_interface	=> $::public_interface,
-    }
+#    class { 'collectd':
+#        graphitehost		=> $::build_node_fqdn,
+#	management_interface	=> $::public_interface,
+#    }
 }
 
 node os_base inherits base {
@@ -190,7 +191,8 @@ node compute inherits "os_base" {
 	multi_host         => $multi_host,
 	sql_connection     => $sql_connection,
 	nova_user_password => $nova_user_password,
-	rabbit_host        => $controller_node_internal,
+	auth_host	   => $controller_node_internal,
+        rabbit_host        => $controller_node_internal,
 	rabbit_password    => $rabbit_password,
 	rabbit_user        => $rabbit_user,
 	glance_api_servers => "${controller_node_internal}:9292",
@@ -228,8 +230,8 @@ node compute inherits "os_base" {
 	quantum_mac_generation_retries 	=> 16,
 	quantum_dhcp_lease_duration    	=> 120,
 	#quantum ovs
-	ovs_bridge_uplinks      	=> ["br-ex:${external_interface}"],
-	ovs_bridge_mappings      	=> ['default:br-ex'],
+#	ovs_bridge_uplinks      	=> ["br-ex:${external_interface}"],
+#	ovs_bridge_mappings      	=> ['default:br-ex'],
 	ovs_tenant_network_type  	=> "gre",
 	ovs_network_vlan_ranges  	=> "default:1000:2000",
 	ovs_integration_bridge   	=> "br-int",
@@ -259,12 +261,12 @@ node master-node inherits "cobbler-node" {
 	autoupdate 	=> true,
     }
 
-    class { 'nagios':
-    }
+#    class { 'nagios':
+#    }
 
-    class { 'graphite': 
-	graphitehost 	=> $::build_node_fqdn,
-    }
+#    class { 'graphite': 
+#	graphitehost 	=> $::build_node_fqdn,
+#    }
 
     # set up a local apt cache.  Eventually this may become a local mirror/repo instead
     class { apt-cacher-ng: 
