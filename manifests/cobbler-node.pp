@@ -49,5 +49,6 @@ class { cobbler:
 # This will load the Ubuntu Server OS into cobbler
 # COE supprts only Ubuntu precise x86_64
  cobbler::ubuntu { "precise":
+  proxy => $::proxy,
  }
 }
