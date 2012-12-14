@@ -3,6 +3,8 @@
 # In this scenario Quantum is using OVS with GRE Tunnels
 # Swift is not included.
 
+$build_node_fqdn = "${::build_node_name}.${::domain_name}"
+
 node base {
     ########### Folsom Release ###############
 
