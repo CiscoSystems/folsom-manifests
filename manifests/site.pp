@@ -9,10 +9,8 @@
 #$proxy			= "http://proxy-server:port-number"
       
 ########### Build Node (Cobbler, Puppet Master, NTP) ######
-# Change the following to the fully-qualified domain name of your build node
-# Your build node will run Puppet, Cobbler, Nagios and other monitoring software
-# It will be used to deploy, configure, and reconfigure your OpenStack nodes
-$build_node_fqdn        = "build_server.domain.name"
+# Change the following to the host name you have given your build node
+$build_node_name        = "build_server"
 
 ########### NTP Configuration ############
 # Change this to the location of a time server in your organization accessible to the build server
@@ -22,10 +20,19 @@ $company_ntp_server	= "time_server.domain.name"
 
 ########### Build Node Cobbler Variables ############
 # Change these 5 parameters to define the IP address and other network settings of your build node
+# The cobbler node *must* have this IP configured and it *must* be on the same network as
+# the hosts to install
 $cobbler_node_ip 	= '192.168.242.100'
 $node_subnet 		= '192.168.242.0'
 $node_netmask 		= '255.255.255.0'
+# This gateway is optional - if there's a gateway providing a default route, put it here
+# If not, comment it out
 $node_gateway 		= '192.168.242.1'
+# This domain name will be the name your build and compute nodes use for the local DNS
+# It doesn't have to be the name of your corporate DNS - a local DNS server on the build
+# node will serve addresses in this domain - but if it is, you can also add entries for
+# the nodes in your corporate DNS iand they will be usable *if* the above addresses 
+# are routeable from elsewhere in your network.
 $domain_name 		= 'domain.name'
 # This setting likely does not need to be changed
 # To speed installation of your OpenStack nodes, it configures your build node to function
