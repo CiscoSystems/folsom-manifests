@@ -9,10 +9,8 @@
 #$proxy			= "http://proxy-server:port-number"
       
 ########### Build Node (Cobbler, Puppet Master, NTP) ######
-# Change the following to the fully-qualified domain name of your build node
-# Your build node will run Puppet, Cobbler, Nagios and other monitoring software
-# It will be used to deploy, configure, and reconfigure your OpenStack nodes
-$build_node_fqdn        = "build_server.domain.name"
+# Change the following to the host name you have given your build node
+$build_node_name        = "build_server"
 
 ########### NTP Configuration ############
 # Change this to the location of a time server in your organization accessible to the build server
@@ -22,10 +20,19 @@ $company_ntp_server	= "time_server.domain.name"
 
 ########### Build Node Cobbler Variables ############
 # Change these 5 parameters to define the IP address and other network settings of your build node
+# The cobbler node *must* have this IP configured and it *must* be on the same network as
+# the hosts to install
 $cobbler_node_ip 	= '192.168.242.100'
 $node_subnet 		= '192.168.242.0'
 $node_netmask 		= '255.255.255.0'
+# This gateway is optional - if there's a gateway providing a default route, put it here
+# If not, comment it out
 $node_gateway 		= '192.168.242.1'
+# This domain name will be the name your build and compute nodes use for the local DNS
+# It doesn't have to be the name of your corporate DNS - a local DNS server on the build
+# node will serve addresses in this domain - but if it is, you can also add entries for
+# the nodes in your corporate DNS iand they will be usable *if* the above addresses 
+# are routeable from elsewhere in your network.
 $domain_name 		= 'domain.name'
 # This setting likely does not need to be changed
 # To speed installation of your OpenStack nodes, it configures your build node to function
@@ -124,19 +131,19 @@ $verbose                 = false
 # for OpenStack. Cobbler will automate the installation of Ubuntu onto these nodes using
 # these settings
 
-node /build-node/ inherits master-node {
-
-# This block defines the control server. Replace "control_server" with the host name of your
-# OpenStack controller, and change the mac to the MAC address of the boot interface of your
-# OpenStack controller. Change the ip to the IP address of your OpenStack controller
-
-# Begin control node
-  cobbler::node { "control_server":
-    mac 		 => "00:11:22:33:44:55:66",
-    ip 		 => "192.168.242.10",
+# This describes the hardware of the nodes to the extent required to network-install their
+# OS.
+# Change this to suit your hardware; the supplied configuration works for UCSes with CIMC
+# using a default password.
+# If you have multiple different hardware types or disk configurations you may need to use
+# multiple block types here.
+define cobbler_node($node_type, $mac, $ip, $power_address) {
+  cobbler::node { $name:
+    mac 		 => $mac,
+    ip 		 => $ip,
     ### UCS CIMC Details ###
-    # Change these 4 parameters to match the management console settings for your server
-    power_address  => "192.168.242.110",
+    # Change these parameters to match the management console settings for your server
+    power_address  => $power_address,
     power_user 	 => "admin",
     power_password => "password",
     power_type     => "ipmitool",
@@ -144,10 +151,18 @@ node /build-node/ inherits master-node {
     # These parameters typically should not be changed
     profile 	 => "precise-x86_64-auto",
     domain         => $::domain_name,
-    node_type 	 => "control",
+    node_type 	 => $node_type,
     preseed 	 => "cisco-preseed",
   }
-# End control node
+}
+
+node /build-node/ inherits master-node {
+
+# This block defines the control server. Replace "control_server" with the host name of your
+# OpenStack controller, and change the mac to the MAC address of the boot interface of your
+# OpenStack controller. Change the ip to the IP address of your OpenStack controller
+
+  cobbler_node { "control_server": node_type => "control", mac => "00:11:22:33:44:55:66", ip => "192.168.242.10", power_address  => "192.168.242.110" }
 
 # This block defines the first compute server. Replace "compute_server01" with the host name
 # of your first OpenStack compute node, and change the mac to the MAC address of the boot
@@ -155,22 +170,7 @@ node /build-node/ inherits master-node {
 # OpenStack compute node
 
 # Begin compute node
-  cobbler::node { "compute_server01":
-    mac       	 => "00:11:22:33:44:55:67",
-    ip 		 => "192.168.242.21",
-    ### UCS CIMC Details ###
-    # Change these 4 parameters to match the management console settings for your server
-    power_address  => "192.168.242.121",
-    power_user 	 => "admin",
-    power_password => "password",
-    power_type     => "ipmitool",
-    ### Advanced Users Configuration ###
-    # These parameters typically should not be changed
-    profile 	 => "precise-x86_64-auto",
-    domain         => $::domain_name,
-    node_type 	 => "compute",
-    preseed 	 => "cisco-preseed",
-  }
+  cobbler_node { "compute_server01": node_type => "compute", mac => "11:22:33:44:55:66:77", ip => "192.168.242.21", power_address  => "192.168.242.121" }
 # End compute node
 
 ### Repeat as needed ###
