@@ -143,7 +143,7 @@ define cobbler_node($node_type, $mac, $ip, $power_address) {
     ip 		 => $ip,
     ### UCS CIMC Details ###
     # Change these parameters to match the management console settings for your server
-    power_address  => $power_address
+    power_address  => $power_address,
     power_user 	 => "admin",
     power_password => "password",
     power_type     => "ipmitool",
@@ -162,7 +162,7 @@ node /build-node/ inherits master-node {
 # OpenStack controller, and change the mac to the MAC address of the boot interface of your
 # OpenStack controller. Change the ip to the IP address of your OpenStack controller
 
-  cobbler_node { "control_server: node_type => "control", mac => "00:11:22:33:44:55:66", ip => "192.168.242.10", power_address  => "192.168.242.110" }
+  cobbler_node { "control_server": node_type => "control", mac => "00:11:22:33:44:55:66", ip => "192.168.242.10", power_address  => "192.168.242.110" }
 
 # This block defines the first compute server. Replace "compute_server01" with the host name
 # of your first OpenStack compute node, and change the mac to the MAC address of the boot
