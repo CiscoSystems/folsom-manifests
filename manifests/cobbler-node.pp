@@ -41,7 +41,6 @@ class { cobbler:
   dhcp_ip_low           => false,
   dhcp_ip_high          => false,
   domain_name 		=> $::domain_name,
-  proxy 		=> $::cobbler_proxy,
   password_crypted 	=> $::password_crypted,
 }
 
