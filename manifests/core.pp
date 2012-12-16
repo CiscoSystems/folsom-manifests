@@ -92,7 +92,7 @@ node os_base inherits base {
 
 }
 
-node control inherits "os_base" {
+class compute($crosstalk_ip) {
 
     class { 'openstack::controller':
 	public_address          => $controller_node_public,
@@ -149,7 +149,7 @@ node control inherits "os_base" {
 	ovs_enable_tunneling    	=> "True",
 	ovs_tunnel_bridge         	=> "br-tun",
 	ovs_tunnel_id_ranges     	=> "1:1000",
-	ovs_local_ip             	=> $ipaddress_eth0,
+	ovs_local_ip             	=> $crosstalk_ip,
 	ovs_server               	=> false,
 	ovs_root_helper          	=> "sudo quantum-rootwrap /etc/quantum/rootwrap.conf",
 	ovs_sql_connection       	=> "mysql://quantum:quantum@${controller_node_address}/quantum",
@@ -180,12 +180,12 @@ node control inherits "os_base" {
 }
 
 
-node compute inherits "os_base" {
+class compute($internal_ip, $crosstalk_ip) {
 
     class { 'openstack::compute':
 	public_interface   => $public_interface,
 	private_interface  => $private_interface,
-	internal_address   => $ipaddress_eth0,
+	internal_address   => $internal_ip,
 	libvirt_type       => 'kvm',
 	fixed_range        => $fixed_network_range,
 	network_manager    => 'nova.network.quantum.manager.QuantumManager',
@@ -238,7 +238,7 @@ node compute inherits "os_base" {
 	ovs_enable_tunneling    	=> "True",
 	ovs_tunnel_bridge       	=> "br-tun",
 	ovs_tunnel_id_ranges     	=> "1:1000",
-	ovs_local_ip             	=> $ipaddress_eth0,
+	ovs_local_ip             	=> $crosstalk_ip,
 	ovs_server               	=> false,
 	ovs_root_helper          	=> "sudo quantum-rootwrap /etc/quantum/rootwrap.conf",
 	ovs_sql_connection       	=> "mysql://quantum:quantum@${controller_node_address}/quantum",

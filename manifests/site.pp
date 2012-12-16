@@ -189,10 +189,10 @@ node /build-node/ inherits master-node {
 node build_server inherits build-node { }
 
 # Change control_server to the host name of your control node
-node control_server inherits control { }
+node control_server inherits os_base { class { control: internal_ip => '192.168.242.10', crosstalk_ip => '192.168.242.10'} }
 
 # Change compute_server01 to the host name of your first compute node
-node compute_server01 inherits compute { }
+node compute_server01 inherits os_base { class { compute: crosstalk_ip => '192.168.242.21'} }
 
 ### Repeat as needed ###
 # Copy the compute_server01 line above and paste a copy here for each additional OpenStack node in
