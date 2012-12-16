@@ -3,9 +3,10 @@
 # In this scenario Quantum is using OVS with GRE Tunnels
 # Swift is not included.
 
-$build_node_fqdn = "${::build_node_name}.${::domain_name}"
 
 node base {
+    $build_node_fqdn = "${::build_node_name}.${::domain_name}"
+
     ########### Folsom Release ###############
 
     # Disable pipelining to avoid unfortunate interactions between apt and
@@ -88,15 +89,16 @@ UcXHbA==
     }
 
     class { 'collectd':
-        graphitehost		=> $::build_node_fqdn,
+        graphitehost		=> $build_node_fqdn,
 	management_interface	=> $::public_interface,
     }
 }
 
 node os_base inherits base {
+    $build_node_fqdn = "${::build_node_name}.${::domain_name}"
 
     class { ntp:
-	servers		=> [$::build_node_fqdn],
+	servers		=> [$build_node_fqdn],
 	ensure 		=> running,
 	autoupdate 	=> true,
     }
@@ -272,6 +274,7 @@ class compute($internal_ip, $crosstalk_ip) {
 # In this example we are using build-node, you dont need to use the FQDN. 
 #
 node master-node inherits "cobbler-node" {
+    $build_node_fqdn = "${::build_node_name}.${::domain_name}"
 
     # Change the servers for your NTP environment
     # (Must be a reachable NTP Server by your build-node, i.e. ntp.esl.cisco.com)
@@ -285,7 +288,7 @@ node master-node inherits "cobbler-node" {
     }
 
     class { 'graphite': 
-	graphitehost 	=> $::build_node_fqdn,
+	graphitehost 	=> $build_node_fqdn,
     }
 
     # set up a local apt cache.  Eventually this may become a local mirror/repo instead
