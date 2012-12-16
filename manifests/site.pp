@@ -7,7 +7,7 @@
 # If you use an HTTP/HTTPS proxy, uncomment this setting and specify the correct proxy URL.
 # If you do not use an HTTP/HTTPS proxy, leave this setting commented out.
 #$proxy			= "http://proxy-server:port-number"
-      
+
 ########### Build Node (Cobbler, Puppet Master, NTP) ######
 # Change the following to the host name you have given your build node
 $build_node_name        = "build_server"
