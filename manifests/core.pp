@@ -114,7 +114,7 @@ node os_base inherits base {
 
 }
 
-class compute($crosstalk_ip) {
+class control($crosstalk_ip) {
 
     class { 'openstack::controller':
 	public_address          => $controller_node_public,
