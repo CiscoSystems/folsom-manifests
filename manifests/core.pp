@@ -276,6 +276,14 @@ class compute($internal_ip, $crosstalk_ip) {
 node master-node inherits "cobbler-node" {
     $build_node_fqdn = "${::build_node_name}.${::domain_name}"
 
+    host { $build_node_fqdn: 
+	ip => $::cobbler_node_ip
+    }
+
+    host { $::build_node_name: 
+	ip => $::cobbler_node_ip
+    }
+
     # Change the servers for your NTP environment
     # (Must be a reachable NTP Server by your build-node, i.e. ntp.esl.cisco.com)
     class { ntp:
