@@ -60,7 +60,7 @@ $password_crypted 	= '$6$UfgWxrIv$k4KfzAEMqMg.fppmSOTd0usI4j6gfjs0962.JXsoJRWa5w
 # OpenStack control node
 $controller_node_address       = '192.168.242.10'
 $controller_node_network       = '192.168.242.0'
-$controller_hostname           = 'control_server'
+$controller_hostname           = 'control-server'
 # Specify the network which should have access to the MySQL database on the OpenStack control
 # node. Typically, this will be the same network as defined in the controller_node_network
 # parameter above. Use MySQL network wild card syntax to specify the desired network.
