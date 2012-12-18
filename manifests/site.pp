@@ -10,13 +10,13 @@
 
 ########### Build Node (Cobbler, Puppet Master, NTP) ######
 # Change the following to the host name you have given your build node
-$build_node_name        = "build_server"
+$build_node_name        = "build-server"
 
 ########### NTP Configuration ############
 # Change this to the location of a time server in your organization accessible to the build server
 # The build server will synchronize with this time server, and will in turn function as the time
 # server for your OpenStack nodes
-$company_ntp_server	= "time_server.domain.name"
+$company_ntp_server	= "time-server.domain.name"
 
 ########### Build Node Cobbler Variables ############
 # Change these 5 parameters to define the IP address and other network settings of your build node
@@ -162,7 +162,7 @@ node /build-node/ inherits master-node {
 # OpenStack controller, and change the mac to the MAC address of the boot interface of your
 # OpenStack controller. Change the ip to the IP address of your OpenStack controller
 
-  cobbler_node { "control_server": node_type => "control", mac => "00:11:22:33:44:55:66", ip => "192.168.242.10", power_address  => "192.168.242.110" }
+  cobbler_node { "control-server": node_type => "control", mac => "00:11:22:33:44:55:66", ip => "192.168.242.10", power_address  => "192.168.242.110" }
 
 # This block defines the first compute server. Replace "compute_server01" with the host name
 # of your first OpenStack compute node, and change the mac to the MAC address of the boot
@@ -170,7 +170,7 @@ node /build-node/ inherits master-node {
 # OpenStack compute node
 
 # Begin compute node
-  cobbler_node { "compute_server01": node_type => "compute", mac => "11:22:33:44:55:66:77", ip => "192.168.242.21", power_address  => "192.168.242.121" }
+  cobbler_node { "compute-server01": node_type => "compute", mac => "11:22:33:44:55:66:77", ip => "192.168.242.21", power_address  => "192.168.242.121" }
 # End compute node
 
 ### Repeat as needed ###
@@ -186,13 +186,13 @@ node /build-node/ inherits master-node {
 # These lines specify the host names in your OpenStack cluster and what the function of each host is
 
 # Change build_server to the host name of your build node
-node build_server inherits build-node { }
+node build-server inherits build-node { }
 
 # Change control_server to the host name of your control node
-node control_server inherits os_base { class { control: crosstalk_ip => '192.168.242.10'} }
+node control-server inherits os_base { class { control: crosstalk_ip => '192.168.242.10'} }
 
 # Change compute_server01 to the host name of your first compute node
-node compute_server01 inherits os_base { class { compute: internal_ip => '192.168.242.21', crosstalk_ip => '192.168.242.21'} }
+node compute-server01 inherits os_base { class { compute: internal_ip => '192.168.242.21', crosstalk_ip => '192.168.242.21'} }
 
 ### Repeat as needed ###
 # Copy the compute_server01 line above and paste a copy here for each additional OpenStack node in
