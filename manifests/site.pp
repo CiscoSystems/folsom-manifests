@@ -219,3 +219,10 @@ $dhcp_service 	= "dnsmasq"
 # These settings load other puppet components. They should not be changed
 import 'cobbler-node'
 import 'core'
+
+## Define the default node, to capture any un-defined nodes that register
+## Simplifies debug when necessary.
+
+node default {
+  notify{"Default Node: Perhaps add a node definition to site.pp": }
+}
