@@ -3,7 +3,10 @@
 # In this scenario Quantum is using OVS with GRE Tunnels
 # Swift is not included.
 
+
 node base {
+    $build_node_fqdn = "${::build_node_name}.${::domain_name}"
+
     ########### Folsom Release ###############
 
     # Disable pipelining to avoid unfortunate interactions between apt and
@@ -59,6 +62,26 @@ UcXHbA==
 	proxy => $::proxy,
     }
 
+    class { pip: }
+
+    # Ensure that the pip packages are fetched appropriately when we're using an
+    # install where there's no direct connection to the net from the openstack
+    # nodes
+    if ! $::default_gateway {
+        Package <| provider=='pip' |> {
+            install_options => "--index-url=http://${build_node_name}/packages/simple/",
+        }
+    } else {
+        if($::proxy) {
+            Package <| provider=='pip' |> {
+                # TODO(ijw): untested
+                install_options => "--proxy=$::proxy"
+            }
+        }
+    }
+    # (the equivalent work for apt is done by the cobbler boot, which sets this up as
+    # a part of the installation.)
+
 
     # /etc/hosts entries for the controller nodes
     host { $::controller_hostname:
@@ -66,15 +89,16 @@ UcXHbA==
     }
 
     class { 'collectd':
-        graphitehost		=> $::build_node_fqdn,
+        graphitehost		=> $build_node_fqdn,
 	management_interface	=> $::public_interface,
     }
 }
 
 node os_base inherits base {
+    $build_node_fqdn = "${::build_node_name}.${::domain_name}"
 
     class { ntp:
-	servers		=> [$::build_node_fqdn],
+	servers		=> [$build_node_fqdn],
 	ensure 		=> running,
 	autoupdate 	=> true,
     }
@@ -90,7 +114,7 @@ node os_base inherits base {
 
 }
 
-node control inherits "os_base" {
+class control($crosstalk_ip) {
 
     class { 'openstack::controller':
 	public_address          => $controller_node_public,
@@ -147,7 +171,7 @@ node control inherits "os_base" {
 	ovs_enable_tunneling    	=> "True",
 	ovs_tunnel_bridge         	=> "br-tun",
 	ovs_tunnel_id_ranges     	=> "1:1000",
-	ovs_local_ip             	=> $ipaddress_eth0,
+	ovs_local_ip             	=> $crosstalk_ip,
 	ovs_server               	=> false,
 	ovs_root_helper          	=> "sudo quantum-rootwrap /etc/quantum/rootwrap.conf",
 	ovs_sql_connection       	=> "mysql://quantum:quantum@${controller_node_address}/quantum",
@@ -178,12 +202,12 @@ node control inherits "os_base" {
 }
 
 
-node compute inherits "os_base" {
+class compute($internal_ip, $crosstalk_ip) {
 
     class { 'openstack::compute':
 	public_interface   => $public_interface,
 	private_interface  => $private_interface,
-	internal_address   => $ipaddress_eth0,
+	internal_address   => $internal_ip,
 	libvirt_type       => 'kvm',
 	fixed_range        => $fixed_network_range,
 	network_manager    => 'nova.network.quantum.manager.QuantumManager',
@@ -236,7 +260,7 @@ node compute inherits "os_base" {
 	ovs_enable_tunneling    	=> "True",
 	ovs_tunnel_bridge       	=> "br-tun",
 	ovs_tunnel_id_ranges     	=> "1:1000",
-	ovs_local_ip             	=> $ipaddress_eth0,
+	ovs_local_ip             	=> $crosstalk_ip,
 	ovs_server               	=> false,
 	ovs_root_helper          	=> "sudo quantum-rootwrap /etc/quantum/rootwrap.conf",
 	ovs_sql_connection       	=> "mysql://quantum:quantum@${controller_node_address}/quantum",
@@ -250,6 +274,15 @@ node compute inherits "os_base" {
 # In this example we are using build-node, you dont need to use the FQDN. 
 #
 node master-node inherits "cobbler-node" {
+    $build_node_fqdn = "${::build_node_name}.${::domain_name}"
+
+    host { $build_node_fqdn: 
+	ip => $::cobbler_node_ip
+    }
+
+    host { $::build_node_name: 
+	ip => $::cobbler_node_ip
+    }
 
     # Change the servers for your NTP environment
     # (Must be a reachable NTP Server by your build-node, i.e. ntp.esl.cisco.com)
@@ -263,12 +296,48 @@ node master-node inherits "cobbler-node" {
     }
 
     class { 'graphite': 
-	graphitehost 	=> $::build_node_fqdn,
+	graphitehost 	=> $build_node_fqdn,
     }
 
     # set up a local apt cache.  Eventually this may become a local mirror/repo instead
     class { apt-cacher-ng: 
   	proxy 		=> $::proxy,
+	avoid_if_range  => true, # Some proxies have issues with range headers
+                                 # this stops us attempting to use them
+                                 # msrginally less efficient with other proxies
+    }
+
+    if ! $::default_gateway {
+        # Prefetch the pip packages and put them somewhere the openstack nodes can fetch them
+        
+        file {  "/var/www":
+            ensure => 'directory',
+	}
+
+        file {  "/var/www/packages":
+            ensure => 'directory',
+        }
+
+        if($::proxy) {
+            $proxy_pfx = "/usr/bin/env http_proxy=${::proxy} https_proxy=${::proxy} "
+        } else {
+            $proxy_pfx=""
+        }
+        exec { 'pip2pi':
+            # Can't use package provider because we're changing its behaviour to use the cache
+            command => "${proxy_pfx}/usr/bin/pip install pip2pi",
+            creates => "/usr/local/bin/pip2pi",
+            require => Package['python-pip'],
+        }
+        Package <| provider=='pip' |> {
+            require => Exec['pip-cache']
+        }
+        exec { 'pip-cache':
+            # All the packages that all nodes - build, compute and control - require from pip
+            command => "${proxy_pfx}/usr/local/bin/pip2pi /var/www/packages collectd xenapi django-tagging graphite-web carbon whisper",
+            creates => '/var/www/packages/simple', # It *does*, but you'll want to force a refresh if you change the line above
+            require => Exec['pip2pi'],
+        }
     }
 
     # set the right local puppet environment up.  This builds puppetmaster with storedconfigs (a nd a local mysql instance)
