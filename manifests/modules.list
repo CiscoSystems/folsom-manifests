@@ -32,3 +32,4 @@ swift
 sysctl
 vswitch
 xinetd
+novaclient-patch

@@ -202,6 +202,10 @@ class control($crosstalk_ip) {
 	dhcp_driver        	 	=> "quantum.agent.linux.dhcp.Dnsmasq",
 	dhcp_use_namespaces     	=> "True",
     }
+# On the control node, we currently need to patch a file for Horizon to work
+# This patch should not be necessary after Jan, 30 2013
+   class {"novaclient-patch": }
+
 }
 
 
