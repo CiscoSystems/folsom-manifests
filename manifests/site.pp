@@ -8,6 +8,12 @@
 # If you do not use an HTTP/HTTPS proxy, leave this setting commented out.
 #$proxy			= "http://proxy-server:port-number"
 
+# If you are behind a proxy you may choose not to use our ftp distribution, and
+# instead try our http distribution location. Note the http location is not
+# a permanent location and may change at any time.
+$location 		= "ftp://ftpeng.cisco.com/openstack/cisco"
+# Alternate, uncomment this one, and coment out the one above
+#$location		= "http://128.107.252.163/openstack/cisco"
 ########### Build Node (Cobbler, Puppet Master, NTP) ######
 # Change the following to the host name you have given your build node
 $build_node_name        = "build-server"
