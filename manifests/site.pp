@@ -6,7 +6,9 @@
 ########### Proxy Configuration ##########
 # If you use an HTTP/HTTPS proxy, uncomment this setting and specify the correct proxy URL.
 # If you do not use an HTTP/HTTPS proxy, leave this setting commented out.
-#$proxy			= "http://proxy-server:port-number"
+#{% if config.proxy %}
+$proxy			= "{{ config.proxy }}"
+#{% endif %}
 
 # If you are behind a proxy you may choose not to use our ftp distribution, and
 # instead try our http distribution location. Note the http location is not
@@ -16,30 +18,30 @@ $location 		= "ftp://ftpeng.cisco.com/openstack/cisco"
 #$location		= "http://128.107.252.163/openstack/cisco"
 ########### Build Node (Cobbler, Puppet Master, NTP) ######
 # Change the following to the host name you have given your build node
-$build_node_name        = "build-server"
+$build_node_name        = "{{ job.build_node.name }}"
 
 ########### NTP Configuration ############
 # Change this to the location of a time server in your organization accessible to the build server
 # The build server will synchronize with this time server, and will in turn function as the time
 # server for your OpenStack nodes
-$company_ntp_server	= "time-server.domain.name"
+$company_ntp_server	= "{{ config.ntp_server }}"
 
 ########### Build Node Cobbler Variables ############
 # Change these 5 parameters to define the IP address and other network settings of your build node
 # The cobbler node *must* have this IP configured and it *must* be on the same network as
 # the hosts to install
-$cobbler_node_ip 	= '192.168.242.100'
-$node_subnet 		= '192.168.242.0'
-$node_netmask 		= '255.255.255.0'
+$cobbler_node_ip 	= '{{ job.build_node.ip }}'
+$node_subnet 		= '{{ config.subnet }}'
+$node_netmask 		= '{{ config.netmask }}'
 # This gateway is optional - if there's a gateway providing a default route, put it here
 # If not, comment it out
-$node_gateway 		= '192.168.242.1'
+$node_gateway 		= '{{ config.gateway }}'
 # This domain name will be the name your build and compute nodes use for the local DNS
 # It doesn't have to be the name of your corporate DNS - a local DNS server on the build
 # node will serve addresses in this domain - but if it is, you can also add entries for
 # the nodes in your corporate DNS iand they will be usable *if* the above addresses 
 # are routeable from elsewhere in your network.
-$domain_name 		= 'domain.name'
+$domain_name 		= '{{ config.domain }}'
 # This setting likely does not need to be changed
 # To speed installation of your OpenStack nodes, it configures your build node to function
 # as a caching proxy storing the Ubuntu install files used to deploy the OpenStack nodes
@@ -54,8 +56,8 @@ $cobbler_proxy 		= "http://${cobbler_node_ip}:3142/"
 # 2) password_crypted
 # Default user is: localadmin 
 # Default MD5 crypted password is "ubuntu": $6$UfgWxrIv$k4KfzAEMqMg.fppmSOTd0usI4j6gfjs0962.JXsoJRWa5wMz8yQk4SfInn4.WZ3L/MCt5u.62tHDGB36EhiKF1
-$admin_user 		= 'localadmin'
-$password_crypted 	= '$6$UfgWxrIv$k4KfzAEMqMg.fppmSOTd0usI4j6gfjs0962.JXsoJRWa5wMz8yQk4SfInn4.WZ3L/MCt5u.62tHDGB36EhiKF1'
+$admin_user 		= '{{ config.admin_user }}'
+$password_crypted 	= '{{ config.admin_password_crypted }}'
 
 
 ########### OpenStack Variables ############
@@ -64,13 +66,13 @@ $password_crypted 	= '$6$UfgWxrIv$k4KfzAEMqMg.fppmSOTd0usI4j6gfjs0962.JXsoJRWa5w
 #
 # Change these next 3 parameters to the network settings of the node which will be your
 # OpenStack control node
-$controller_node_address       = '192.168.242.10'
-$controller_node_network       = '192.168.242.0'
-$controller_hostname           = 'control-server'
+$controller_node_address       = '{{ job.control_node.ip }}'
+$controller_node_network       = '{{ config.subnet }}'
+$controller_hostname           = '{{ job.control_node.name }}'
 # Specify the network which should have access to the MySQL database on the OpenStack control
 # node. Typically, this will be the same network as defined in the controller_node_network
 # parameter above. Use MySQL network wild card syntax to specify the desired network.
-$db_allowed_network            = '192.168.242.%'
+$db_allowed_network            = '{{ config.subnet_as_sql }}'
 # These next two values typically do not need to be changed. They define the network connectivity
 # of the OpenStack controller
 $controller_node_public        = $controller_node_address
@@ -131,16 +133,16 @@ $verbose                 = false
 # using a default password.
 # If you have multiple different hardware types or disk configurations you may need to use
 # multiple block types here.
-define cobbler_node($node_type, $mac, $ip, $power_address, $power_id = undef) {
+define cobbler_node($node_type, $mac, $ip, $power_address, $power_user, $power_password, $power_type, $power_id) {
   cobbler::node { $name:
     mac 	   => $mac,
     ip 		   => $ip,
     ### UCS CIMC Details ###
     # Change these parameters to match the management console settings for your server
     power_address  => $power_address,
-    power_user 	   => "admin",
-    power_password => "password",
-    power_type     => "ipmitool",
+    power_user 	 => $power_user,
+    power_password => $power_password,
+    power_type     => $power_type,
     power_id       => $power_id,
     ### Advanced Users Configuration ###
     # These parameters typically should not be changed
@@ -157,7 +159,7 @@ node /build-node/ inherits master-node {
 # OpenStack controller, and change the mac to the MAC address of the boot interface of your
 # OpenStack controller. Change the ip to the IP address of your OpenStack controller
 
-  cobbler_node { "control-server": node_type => "control", mac => "00:11:22:33:44:55:66", ip => "192.168.242.10", power_address  => "192.168.242.110" }
+  cobbler_node { "{{ job.control_node.name }}": node_type => "control", mac => "{{ job.control_node.mac }}", ip => "{{ job.control_node.ip }}", power_address => "{{ job.control_node.power_address }}", power_user => "{{ job.control_node.power_user }}", power_password => "{{ job.control_node.power_password }}", power_type => "{{ job.control_node.power_type }}", power_id => "{{ job.control_node.power_id }}" }
 
 # This block defines the first compute server. Replace "compute_server01" with the host name
 # of your first OpenStack compute node, and change the mac to the MAC address of the boot
@@ -165,10 +167,9 @@ node /build-node/ inherits master-node {
 # OpenStack compute node
 
 # Begin compute node
-  cobbler_node { "compute-server01": node_type => "compute", mac => "11:22:33:44:55:66:77", ip => "192.168.242.21", power_address  => "192.168.242.121" }
-# Example with UCS blade power_address with a sub-group (in UCSM), and a ServiceProfile for power_id
-# you will need to change power type to 'USC' in the define macro above 
-#  cobbler_node { "compute-server01": node_type => "compute", mac => "11:22:33:44:55:66:77", ip => "192.168.242.21", power_address  => "192.168.242.121:org-cisco", power_id => "OpenStack-1" }
+#{% for node in job.compute_nodes %}
+  cobbler_node { "{{ node.name }}": node_type => "compute", mac => "{{ node.mac }}", ip => "{{ node.ip }}", power_address  => "{{ node.power_address }}", power_user => "{{ node.power_user }}", power_password => "{{ node.power_password }}", power_type => "{{ node.power_type }}", power_id => "{{ node.power_id }}" }
+#{% endfor %}
 # End compute node
 
 ### Repeat as needed ###
@@ -184,13 +185,15 @@ node /build-node/ inherits master-node {
 # These lines specify the host names in your OpenStack cluster and what the function of each host is
 
 # Change build_server to the host name of your build node
-node build-server inherits build-node { }
+node /{{ job.build_node.fqdn }}/ inherits build-node { }
 
 # Change control_server to the host name of your control node
-node control-server inherits os_base { class { control: crosstalk_ip => '192.168.242.10'} }
+node /{{ job.control_node.fqdn }}/ inherits os_base { class { control: crosstalk_ip => '{{ job.control_node.ip }}'} }
 
 # Change compute_server01 to the host name of your first compute node
-node compute-server01 inherits os_base { class { compute: internal_ip => '192.168.242.21', crosstalk_ip => '192.168.242.21'} }
+#{% for node in job.compute_nodes %}
+node /{{ node.fqdn }}/ inherits os_base { class { compute: internal_ip => '{{ node.ip }}', crosstalk_ip => '{{ node.ip }}'} }
+#{% endfor %}
 
 ### Repeat as needed ###
 # Copy the compute_server01 line above and paste a copy here for each additional OpenStack node in
