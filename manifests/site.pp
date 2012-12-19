@@ -137,7 +137,7 @@ $verbose                 = false
 # using a default password.
 # If you have multiple different hardware types or disk configurations you may need to use
 # multiple block types here.
-define cobbler_node($node_type, $mac, $ip, $power_address, $power_type = 'ipmitools', $power_id = undef) {
+define cobbler_node($node_type, $mac, $ip, $power_address, $power_id = undef) {
   cobbler::node { $name:
     mac 	   => $mac,
     ip 		   => $ip,
@@ -146,7 +146,7 @@ define cobbler_node($node_type, $mac, $ip, $power_address, $power_type = 'ipmito
     power_address  => $power_address,
     power_user 	   => "admin",
     power_password => "password",
-    power_type     => $power_type,
+    power_type     => "ipmitools",
     power_id       => $power_id,
     ### Advanced Users Configuration ###
     # These parameters typically should not be changed
@@ -172,8 +172,9 @@ node /build-node/ inherits master-node {
 
 # Begin compute node
   cobbler_node { "compute-server01": node_type => "compute", mac => "11:22:33:44:55:66:77", ip => "192.168.242.21", power_address  => "192.168.242.121" }
-# Example with UCS blade power_type, power_address with a sub-group (in UCSM), and a ServiceProfile for power_id
-#  cobbler_node { "compute-server01": node_type => "compute", mac => "11:22:33:44:55:66:77", ip => "192.168.242.21", power_address  => "192.168.242.121:org-cisco", power_type => "ucs", power_id => "OpenStack-1" }
+# Example with UCS blade power_address with a sub-group (in UCSM), and a ServiceProfile for power_id
+# you will need to change power type to 'USC' in the define macro above 
+#  cobbler_node { "compute-server01": node_type => "compute", mac => "11:22:33:44:55:66:77", ip => "192.168.242.21", power_address  => "192.168.242.121:org-cisco", power_id => "OpenStack-1" }
 # End compute node
 
 ### Repeat as needed ###
