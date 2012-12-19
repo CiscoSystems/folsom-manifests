@@ -25,6 +25,8 @@ node base {
 
     apt::source { "cisco-openstack-mirror_folsom-proposed":
 	location => "ftp://ftpeng.cisco.com/openstack/cisco/",
+#  If you find that you can't react ftpeng.cisco.com (perhaps you're inside Cisco) Try the following address
+# 	location => "http://128.107.252.163/openstack/cisco/",
 	release => "folsom-proposed",
 	repos => "main",
 	key => "E8CC67053ED3B199",
