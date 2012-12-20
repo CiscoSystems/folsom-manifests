@@ -203,6 +203,13 @@ class control($crosstalk_ip) {
 # This patch should not be necessary after Jan, 30 2013
    class {"novaclient-patch": }
 
+   network_config { "$::external_interface":
+     ensure	=> 'present',
+     family	=> 'inet',
+     method	=> 'manual',
+     onboot	=> 'true',
+   }
+
 }
 
 

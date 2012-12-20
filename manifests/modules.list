@@ -33,3 +33,4 @@ sysctl
 vswitch
 xinetd
 novaclient-patch
+network
