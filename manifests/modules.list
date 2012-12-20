@@ -34,3 +34,4 @@ vswitch
 xinetd
 novaclient-patch
 network
+filemapper
