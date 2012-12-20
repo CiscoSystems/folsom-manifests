@@ -8,14 +8,10 @@ echo "This is a destructive process!!!"
 sleep 15
 
 echo "Removing nodes from cobbler"
-for n in `cobbler system list` 
-do cobbler system remove --name=$n
-done
+sudo sh -c 'for n in `cobbler system list` ; do cobbler system remove --name=$n ; done'
 
 echo "Re-running puppet apply on /etc/puppet/manifests/site.pp"
-puppet apply /etc/puppet/manifests/site.pp
+sudo puppet apply /etc/puppet/manifests/site.pp
 
 echo "Re-building the nodes"
-for n in `cobbler system list`
-do /etc/puppet/manifests/clean_node.sh $n
-done
+sudo sh -c 'for n in `cobbler system list` ; do /etc/puppet/manifests/clean_node.sh $n ; done'
