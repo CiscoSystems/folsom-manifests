@@ -1,5 +1,7 @@
 # This document serves as an example of how to deploy
-# basic multi-node openstack environments.
+# basic multi-node openstack environments.  Rename to
+# site.pp after editing.
+#
 # In this scenario Quantum is using OVS with GRE Tunnels
 # Swift is not included.
 
