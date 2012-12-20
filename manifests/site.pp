@@ -152,7 +152,7 @@ define cobbler_node($node_type, $mac, $ip, $power_address, $power_id = undef) {
     power_address  => $power_address,
     power_user 	   => "admin",
     power_password => "password",
-    power_type     => "ipmitools",
+    power_type     => "ipmitool",
     power_id       => $power_id,
     ### Advanced Users Configuration ###
     # These parameters typically should not be changed
