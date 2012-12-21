@@ -8,7 +8,7 @@
 
 echo "Resetting nodes!"
 echo " !!!!!!!!!!!!!!!!! "
-echo "NOTE: You probably should only use this if you're rebuilding everything!
+echo "NOTE: You probably should only use this if you're rebuilding everything!"
 echo " !!!!!!!!!!!!!!!!! "
 echo "This script will remove and reset the nodes in 15 seconds, ^C to cancel!"
 echo "This is a destructive process!!!"
