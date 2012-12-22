@@ -208,7 +208,6 @@ class control($crosstalk_ip) {
      ipaddress  => '0.0.0.0',
      netmask    => '255.255.255.255',
      onboot     => 'true',
-     options    => {'pre-up' => 'sleep 2'},
      notify     => Service['networking'],
    }
 
