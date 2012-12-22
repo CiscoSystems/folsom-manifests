@@ -24,7 +24,7 @@ node base {
     # Load apt prerequisites.  This is only valid on Ubuntu systmes
 
     apt::source { "cisco-openstack-mirror_folsom-proposed":
-	location => "ftp://ftpeng.cisco.com/openstack/cisco/",
+	location => $::location, 
 	release => "folsom-proposed",
 	repos => "main",
 	key => "E8CC67053ED3B199",
@@ -199,6 +199,22 @@ class control($crosstalk_ip) {
 	dhcp_driver        	 	=> "quantum.agent.linux.dhcp.Dnsmasq",
 	dhcp_use_namespaces     	=> "True",
     }
+
+   network_config { "$::external_interface":
+     ensure     => 'present',
+     hotplug    => 'false',
+     family     => 'inet',
+     method     => 'static',
+     ipaddress  => '0.0.0.0',
+     netmask    => '255.255.255.255',
+     onboot     => 'true',
+     notify     => Service['networking'],
+   }
+
+   service {'networking':
+    ensure      => 'running',
+  }
+
 }
 
 
