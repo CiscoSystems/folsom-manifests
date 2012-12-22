@@ -32,3 +32,6 @@ swift
 sysctl
 vswitch
 xinetd
+novaclient-patch
+network
+filemapper
