@@ -25,12 +25,12 @@ node base {
 
 #{% for archive in job.description.archives %}
 
-    apt::source { "{{ archive.name }}":
+    openstack::apt { "{{ archive.name }}":
       location => "{{ archive.location }}",
 	  release => "{{ archive.pocket }}",
 	  repos => "{{ archive.components|join:' ' }}",
    	  key => "{{ archive.key_id }}",
-	  key_content => '{{ archive.key_data }}',
+      key_content => '{{ archive.key_data }}',
 	  proxy => '{{ archive.proxy }}',
     }
 
