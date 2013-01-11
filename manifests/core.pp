@@ -32,9 +32,14 @@ node base {
    	  key => "{{ archive.key_id }}",
       key_content => '{{ archive.key_data }}',
 	  proxy => '{{ archive.proxy }}',
+      require => File["/etc/apt/apt.conf.d/noproxy.conf"]
     }
 
 #{% endfor %}
+
+    file { "/etc/apt/apt.conf.d/noproxy.conf":
+       content => 'Acquire::http::Proxy::apt.ctocllab.cisco.com "DIRECT";'
+    }
 
     class { pip: }
 
