@@ -158,9 +158,9 @@ class control($crosstalk_ip) {
 	quantum_auth_port            	=> "35357",
 	quantum_rabbit_host          	=> "${controller_node_address}",
 	quantum_rabbit_port          	=> "5672",
-	quantum_rabbit_user          	=> "quantum",
-	quantum_rabbit_password      	=> "quantum",
-	quantum_rabbit_virtual_host  	=> "/quantum",
+	quantum_rabbit_user          	=> "openstack_rabbit_user",
+	quantum_rabbit_password      	=> "openstack_rabbit_password",
+	quantum_rabbit_virtual_host  	=> "/",
 	quantum_control_exchange     	=> "quantum",
 	quantum_core_plugin          	=> "quantum.plugins.openvswitch.ovs_quantum_plugin.OVSQuantumPluginV2",
 	ovs_bridge_uplinks      	=> ["br-ex:${external_interface}"],
@@ -199,17 +199,6 @@ class control($crosstalk_ip) {
 	dhcp_driver        	 	=> "quantum.agent.linux.dhcp.Dnsmasq",
 	dhcp_use_namespaces     	=> "True",
     }
-
-   network_config { "$::external_interface":
-     ensure     => 'present',
-     hotplug    => 'false',
-     family     => 'inet',
-     method     => 'static',
-     ipaddress  => '0.0.0.0',
-     netmask    => '255.255.255.255',
-     onboot     => 'true',
-     notify     => Service['networking'],
-   }
 
    service {'networking':
     ensure      => 'running',
@@ -260,9 +249,9 @@ class compute($internal_ip, $crosstalk_ip) {
 	quantum_auth_port            	=> "35357",
 	quantum_rabbit_host          	=> "${controller_node_address}",
 	quantum_rabbit_port          	=> "5672",
-	quantum_rabbit_user          	=> "quantum",
-	quantum_rabbit_password      	=> "quantum",
-	quantum_rabbit_virtual_host  	=> "/quantum",
+	quantum_rabbit_user          	=> "openstack_rabbit_user",
+	quantum_rabbit_password      	=> "openstack_rabbit_password",
+	quantum_rabbit_virtual_host  	=> "/",
 	quantum_control_exchange     	=> "quantum",
 	quantum_core_plugin            	=> "quantum.plugins.openvswitch.ovs_quantum_plugin.OVSQuantumPluginV2",
 	quantum_mac_generation_retries 	=> 16,

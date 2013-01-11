@@ -19,6 +19,7 @@ $cobbler_node_fqdn 	        = "${::build_node_name}.${::domain_name}"
 	sed -e \"/logdir/ a server=$cobbler_node_fqdn\" -i /target/etc/puppet/puppet.conf ; \
 	sed -e 's/START=no/START=yes/' -i /target/etc/default/puppet ; \
 	echo -e \"server $cobbler_node_fqdn iburst\" > /target/etc/ntp.conf ; \
+	echo -e \"auto $external_interface\\niface $external_interface inet manual\\n\\tup ifconfig $external_interface up\\n\\tdown ifconfig $external_interface down\" >> /target/etc/network/interfaces ; \
 	echo '8021q' >> /target/etc/modules ; \
 	true
 	",
