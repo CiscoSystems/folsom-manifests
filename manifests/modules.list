@@ -35,3 +35,4 @@ xinetd
 novaclient-patch
 network
 filemapper
+boolean

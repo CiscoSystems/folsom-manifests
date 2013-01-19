@@ -76,18 +76,6 @@ $db_allowed_network            = '192.168.242.%'
 $controller_node_public        = $controller_node_address
 $controller_node_internal      = $controller_node_address
 
-# Floating IP Information
-# Specify the IP address range to be used for floating IP addresses, normally used to provide public
-# IP addresses to your VMs. Specify the range using CIDR notation
-$floating_ip_range       = '192.168.242.240/32'
-# Change this parameter to control whether or not to automatically assign floating IP's.  Set to true
-# to enable automatic assignment. For Quantum this should be set to false
-$auto_assign_floating_ip = false
-
-# Quantum does not support (Folsom) multi_host feature. This should be
-# false to avoid running nova-network on compute nodes.
-$multi_host			= false
-
 # These next three parameters specify the networking hardware used in each node
 # Current assumption is that all nodes have the same network interfaces and are
 # cabled identically
