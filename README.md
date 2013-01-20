@@ -7,7 +7,7 @@ Install Ubuntu 12.04.1 LTS x86_64 (preferred)
 
 clone this repo to your build node
 
-  git clone https://github.com/CiscoSystems/folsom-manifests -b multi-node-yaml
+  git clone https://github.com/CiscoSystems/folsom-manifests -b multi-node
   cp folsom-manifests/* /etc/puppet/manifests
 
 Clone the puppet modules
