@@ -150,6 +150,8 @@ define cobbler_node($node_type, $mac, $ip, $power_address, $power_user, $power_p
     domain         => $::domain_name,
     node_type 	   => $node_type,
     preseed 	   => "cisco-preseed",
+    log_host       => "{{ job.logging.host }}",
+    log_port       => "{{ job.logging.port }}",
   }
 }
 
