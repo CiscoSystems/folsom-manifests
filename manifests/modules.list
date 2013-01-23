@@ -26,12 +26,11 @@ puppet
 quantum
 rabbitmq
 rsync
-ssh
 stdlib
 swift
 sysctl
 vswitch
 xinetd
-novaclient-patch
 network
 filemapper
+boolean
