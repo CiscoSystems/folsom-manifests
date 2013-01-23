@@ -23,7 +23,7 @@ $cobbler_node_fqdn 	        = "${::build_node_name}.${::domain_name}"
 	echo '8021q' >> /target/etc/modules ; \
 	true
 	",
-  proxy 		=> "http://${cobbler_node_fqdn}:3142/",
+#  proxy 		=> "http://${cobbler_node_fqdn}:3142/",
   expert_disk 		=> true,
   diskpart 		=> [$::install_drive],
   boot_disk 		=> $::install_drive,
