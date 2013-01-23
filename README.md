@@ -15,14 +15,9 @@ Clone the puppet modules
   cd /etc/puppet/manifests/
   /etc/puppet/manifests/puppet-modules.sh
 
-Edit the yaml config:
+Create a copy of the site.pp.example file and name it site.pp:
 
-  cp /etc/puppet/manifests/site.yaml{.example,}
-  vi /etc/puppet/manifests/site.yaml
-
-Run the site generator:
-
-  /etc/puppet/manifests/create_site.py
+  cp site.pp.example site.pp
 
 "Reset" your environment
 
