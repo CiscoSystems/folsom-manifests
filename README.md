@@ -1,32 +1,37 @@
 Folsom-manifests
 ================
 
-Example manifests for the Folsom release of Openstack
+Install Ubuntu 12.04.1 LTS x86_64 (preferred)
 
-This repo contains a branch for each configuration environment.
-For instance the all-in-one branch contains the README and config
-files needed for that kind of environment.
+  apt-get update && apt-get upgrade && apt-get install git puppet ipmitool python-jinja2 python-passlib python-yaml
 
-You should swich to the branch corresponding your environment set up:
+clone this repo to your build node
 
-	git checkout <config-name>
-	i.e. git checkout all-in-one
+  git clone https://github.com/CiscoSystems/folsom-manifests -b multi-node
+  cp folsom-manifests/* /etc/puppet/manifests
 
-Adding New Config Environments
-==============================
+Clone the puppet modules
 
-Different configs are in different branches. 
+  cd /etc/puppet/manifests/
+  /etc/puppet/manifests/puppet-modules.sh
 
-	git branch <config-name>
+Edit the yaml config:
 
-	git push origin <config-name>
+  cp /etc/puppet/manifests/site.yaml{.example,}
+  vi /etc/puppet/manifests/site.yaml
 
-	git checkout <config-name>
+Run the site generator:
 
-edit your config files
+  /etc/puppet/manifests/create_site.py
 
-	git add -A
+"Reset" your environment
 
-	git commit -m 'add a commit message to describe your config files or changes'
+  puppet apply -v /etc/puppet/manifests/site.pp
+  puppet plugin download
+  /etc/puppet/manifests/reset_site.sh
 
-	git push
+Wait ~ 15 minutes, and then check out your new OpenStack cluster:
+
+  http://{control_node_ip_or_dns}/
+
+
