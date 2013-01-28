@@ -69,6 +69,14 @@ if ! run_cmd apt-get $APT_CONFIG update; then
   exit 1
 fi
 
+# Make sure the distro is up to date
+echo -e "\n\nUpdate packages...\n\n"
+if ! run_cmd apt-get $APT_CONFIG dist-upgrade -y; then
+  echo "Can't update packages"
+  exit 1
+fi
+
+
 # Install prerequisite packages
 echo "Installing prerequisite apps: git, puppet, ipmitool, python-software-properties.."
 if ! run_cmd apt-get $APT_CONFIG install -qym git puppet ipmitool python-software-properties; then
@@ -104,6 +112,13 @@ fi
 echo -e "\n\nUpdated apt repository...\n\n"
 if ! run_cmd apt-get $APT_CONFIG update; then
   echo "Can't update apt repository"
+  exit 1
+fi
+
+# Make sure the distro is up to date
+echo -e "\n\nUpdate packages...\n\n"
+if ! run_cmd apt-get $APT_CONFIG dist-upgrade -y; then
+  echo "Can't update packages"
   exit 1
 fi
 
