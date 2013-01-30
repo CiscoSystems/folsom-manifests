@@ -107,6 +107,13 @@ if ! run_cmd apt-get $APT_CONFIG update; then
   exit 1
 fi
 
+# Make sure the distro is up to date
+echo -e "\n\nUpdate packages...\n\n"
+if ! run_cmd apt-get $APT_CONFIG dist-upgrade -y; then
+  echo "Can't update packages"
+  exit 1
+fi
+
 # Change to the manifests directory, as the puppet-modules.sh script expects to find a file in the local
 # directory that lists the modules to download
 cd /etc/puppet/manifests
