@@ -14,11 +14,9 @@ $cobbler_node_fqdn 	        = "${::build_node_name}.${::domain_name}"
   password_crypted 	=> $::password_crypted,
   packages 		=> "openssh-server vim vlan lvm2 ntp puppet",
   ntp_server 		=> $::build_node_fqdn,
-  late_command 		=> "
+  late_command 		=> "sed -e '/logdir/ a pluginsync=true' -i /target/etc/puppet/puppet.conf ; \
 	echo '*.* @{{ job.logging.host }}:{{ job.logging.port }}' > /target/etc/rsyslog.d/99-remote.conf ; \
-	sed -e '/logdir/ a pluginsync=true' -i /target/etc/puppet/puppet.conf ; \
 	sed -e \"/logdir/ a server=$cobbler_node_fqdn\" -i /target/etc/puppet/puppet.conf ; \
-	sed -e 's/START=no/START=yes/' -i /target/etc/default/puppet ; \
 	echo -e \"server $cobbler_node_fqdn iburst\" > /target/etc/ntp.conf ; \
 	echo '8021q' >> /target/etc/modules ; \
 	true
@@ -27,6 +25,7 @@ $cobbler_node_fqdn 	        = "${::build_node_name}.${::domain_name}"
   expert_disk 		=> true,
   diskpart 		=> [$::install_drive],
   boot_disk 		=> $::install_drive,
+  autostart_puppet      => $::autostart_puppet
  }
 
 
