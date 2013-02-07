@@ -52,11 +52,12 @@ $cobbler_proxy 		= "http://${cobbler_node_ip}:3142/"
 # The following variables may be changed by the system admin:
 # 1) admin_user
 # 2) password_crypted
+# 3) autostart_puppet -- whether the puppet agent will auto start
 # Default user is: localadmin 
 # Default MD5 crypted password is "ubuntu": $6$UfgWxrIv$k4KfzAEMqMg.fppmSOTd0usI4j6gfjs0962.JXsoJRWa5wMz8yQk4SfInn4.WZ3L/MCt5u.62tHDGB36EhiKF1
 $admin_user 		= 'localadmin'
 $password_crypted 	= '$6$UfgWxrIv$k4KfzAEMqMg.fppmSOTd0usI4j6gfjs0962.JXsoJRWa5wMz8yQk4SfInn4.WZ3L/MCt5u.62tHDGB36EhiKF1'
-
+$autostart_puppet       = true
 
 ########### OpenStack Variables ############
 # These values define parameters which will be used to deploy and configure OpenStack

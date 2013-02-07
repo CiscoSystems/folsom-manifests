@@ -20,5 +20,8 @@ sudo sh -c 'for n in `cobbler system list` ; do cobbler system remove --name=$n 
 echo "Re-running puppet apply on /etc/puppet/manifests/site.pp"
 sudo puppet apply /etc/puppet/manifests/site.pp
 
+echo "Applying any non-captured plugins to the puppet master"
+sudo puppet plugin download
+
 echo "Re-building the nodes"
 sudo sh -c 'for n in `cobbler system list` ; do /etc/puppet/manifests/clean_node.sh $n ; done'
