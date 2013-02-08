@@ -121,8 +121,8 @@ class control($crosstalk_ip) {
     }
 
     nrpe::command { 'check_ntp_time':
-	ensure          => present,
-	command         => "check_ntp_time -H $::company_ntp_server -w 1 -c 3";
+        ensure          => present,
+        command         => "check_ntp_time -H $::company_ntp_server -w 1 -c 3";
     }
 
     class { 'openstack::controller':
@@ -262,8 +262,8 @@ class compute($internal_ip, $crosstalk_ip) {
     }
 
     nrpe::command { 'check_ntp_time':
-	ensure          => present,
-	command         => "check_ntp_time -H $::company_ntp_server -w 1 -c 3";
+        ensure          => present,
+        command         => "check_ntp_time -H $::company_ntp_server -w 1 -c 3";
     }
 
     class { 'openstack::compute':
