@@ -145,6 +145,46 @@ class control($crosstalk_ip) {
         command         => "check_users -w '10' -c '25'";
     }
 
+    nrpe::command { 'check_glance1':
+        ensure          => present,
+        command         => "check_glance1 --host $::controller_node_address --auth_url http://$::controller_node_address:5000/v2.0/ --username admin --password $admin_password --tenant openstack --req_count 1 --req_images precise-x86_64";
+    }
+
+    nrpe::command { 'check_keystone':
+        ensure          => present,
+        command         => "check_keystone --host $::controller_node_address --auth_url http://$::controller_node_address:5000/v2.0/ --username admin --password $admin_password --tenant openstack volume identity compute image network ec2";
+    }
+
+    nrpe::command { 'check_novaapi':
+        ensure          => present,
+        command         => "check_novaapi --host $::controller_node_address --auth_url http://$::controller_node_address:5000/v2.0/ --username admin --password $admin_password --tenant openstack";
+    }
+
+    nrpe::command { 'check_rabbitmq_aliveness':
+        ensure          => present,
+        command         => "check_rabbitmq_aliveness -H $::controller_node_address -u $::rabbit_user -p $::rabbit_password --vhost=/";
+    }
+
+    nrpe::command { 'check_rabbitmq_objects':
+        ensure          => present,
+        command         => "check_rabbitmq_objects -H $::controller_node_address -u $::rabbit_user -p $::rabbit_password";
+    }
+
+    nrpe::command { 'check_rabbitmq_overview':
+        ensure          => present,
+        command         => "check_rabbitmq_overview -H $::controller_node_address -u $::rabbit_user -p $::rabbit_password";
+    }
+
+    nrpe::command { 'check_rabbitmq_server':
+        ensure          => present,
+        command         => "check_rabbitmq_server -H $::controller_node_address -u $::rabbit_user -p $::rabbit_password -n $::controller_hostname";
+    }
+
+    nrpe::command { 'check_rabbitmq_watermark':
+        ensure          => present,
+        command         => "check_rabbitmq_watermark -H $::controller_node_address -u $::rabbit_user -p $::rabbit_password -n $::controller_hostname";
+    }
+
     class { 'openstack::controller':
 	public_address          => $controller_node_public,
 	public_interface        => $public_interface,
@@ -305,6 +345,12 @@ class compute($internal_ip, $crosstalk_ip) {
         ensure          => present,
         command         => "check_users -w '10' -c '25'";
     }
+
+    nrpe::command { 'check_vm':
+        ensure          => present,
+        command         => "check_vm";
+    }
+
 
     class { 'openstack::compute':
 	public_interface   => $public_interface,
