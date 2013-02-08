@@ -116,6 +116,15 @@ node os_base inherits base {
 
 class control($crosstalk_ip) {
 
+    class { 'nrpe':
+        allowed_hosts           => ['127.0.0.1', "$::cobbler_node_ip"]
+    }
+
+    nrpe::command { 'check_ntp_time':
+	ensure          => present,
+	command         => "check_ntp_time -H $::company_ntp_server -w 1 -c 3";
+    }
+
     class { 'openstack::controller':
 	public_address          => $controller_node_public,
 	public_interface        => $public_interface,
@@ -247,6 +256,15 @@ class control($crosstalk_ip) {
 
 
 class compute($internal_ip, $crosstalk_ip) {
+
+    class { 'nrpe':
+        allowed_hosts            => ['127.0.0.1', "$::cobbler_node_ip"]
+    }
+
+    nrpe::command { 'check_ntp_time':
+	ensure          => present,
+	command         => "check_ntp_time -H $::company_ntp_server -w 1 -c 3";
+    }
 
     class { 'openstack::compute':
 	public_interface   => $public_interface,
