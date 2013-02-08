@@ -152,12 +152,12 @@ class control($crosstalk_ip) {
 
     nrpe::command { 'check_keystone':
         ensure          => present,
-        command         => "check_keystone --host $::controller_node_address --auth_url http://$::controller_node_address:5000/v2.0/ --username admin --password $admin_password --tenant openstack volume identity compute image network ec2";
+        command         => "check_keystone --auth_url http://$::controller_node_address:5000/v2.0/ --username admin --password $admin_password --tenant openstack volume identity compute image network ec2";
     }
 
     nrpe::command { 'check_novaapi':
         ensure          => present,
-        command         => "check_novaapi --host $::controller_node_address --auth_url http://$::controller_node_address:5000/v2.0/ --username admin --password $admin_password --tenant openstack";
+        command         => "check_novaapi --auth_url http://$::controller_node_address:5000/v2.0/ --username admin --password $admin_password --tenant openstack";
     }
 
     nrpe::command { 'check_rabbitmq_aliveness':
