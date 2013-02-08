@@ -125,6 +125,26 @@ class control($crosstalk_ip) {
         command         => "check_ntp_time -H $::company_ntp_server -w 1 -c 3";
     }
 
+    nrpe::command { 'check_all_disks':
+        ensure          => present,
+        command         => "check_disk -w '20%' -c '10%' -e";
+    }
+
+    nrpe::command { 'check_load':
+        ensure          => present,
+        command         => "check_load -w '5.0,4.0,3.0' -c '10.0,6.0,4.0'";
+    }
+
+    nrpe::command { 'check_procs':
+        ensure          => present,
+        command         => "check_procs -w '250' -c '400'";
+    }
+
+    nrpe::command { 'check_users':
+        ensure          => present,
+        command         => "check_users -w '10' -c '25'";
+    }
+
     class { 'openstack::controller':
 	public_address          => $controller_node_public,
 	public_interface        => $public_interface,
@@ -264,6 +284,26 @@ class compute($internal_ip, $crosstalk_ip) {
     nrpe::command { 'check_ntp_time':
         ensure          => present,
         command         => "check_ntp_time -H $::company_ntp_server -w 1 -c 3";
+    }
+
+    nrpe::command { 'check_all_disks':
+        ensure          => present,
+        command         => "check_disk -w '20%' -c '10%' -e";
+    }
+
+    nrpe::command { 'check_load':
+        ensure          => present,
+        command         => "check_load -w '5.0,4.0,3.0' -c '10.0,6.0,4.0'";
+    }
+
+    nrpe::command { 'check_procs':
+        ensure          => present,
+        command         => "check_procs -w '350' -c '500'";
+    }
+
+    nrpe::command { 'check_users':
+        ensure          => present,
+        command         => "check_users -w '10' -c '25'";
     }
 
     class { 'openstack::compute':
