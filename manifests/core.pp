@@ -23,9 +23,9 @@ node base {
 
     # Load apt prerequisites.  This is only valid on Ubuntu systmes
 
-    apt::source { "cisco-openstack-mirror_folsom-proposed":
+    apt::source { "cisco-openstack-mirror_folsom":
 	location => $::location, 
-	release => "folsom-proposed",
+	release => "folsom",
 	repos => "main",
 	key => "E8CC67053ED3B199",
 	key_content => '-----BEGIN PGP PUBLIC KEY BLOCK-----
