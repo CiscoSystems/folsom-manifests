@@ -12,7 +12,7 @@
 # instead try our http distribution location. Note the http location is not
 # a permanent location and may change at any time.
 $location 		= "ftp://ftpeng.cisco.com/openstack/cisco"
-# Alternate, uncomment this one, and coment out the one above
+# Alternate, uncomment this one, and comment out the one above
 #$location		= "http://128.107.252.163/openstack/cisco"
 ########### Build Node (Cobbler, Puppet Master, NTP) ######
 # Change the following to the host name you have given your build node
@@ -37,7 +37,7 @@ $node_gateway 		= '192.168.242.1'
 # This domain name will be the name your build and compute nodes use for the local DNS
 # It doesn't have to be the name of your corporate DNS - a local DNS server on the build
 # node will serve addresses in this domain - but if it is, you can also add entries for
-# the nodes in your corporate DNS iand they will be usable *if* the above addresses 
+# the nodes in your corporate DNS environment they will be usable *if* the above addresses 
 # are routeable from elsewhere in your network.
 $domain_name 		= 'domain.name'
 # This setting likely does not need to be changed
@@ -85,7 +85,7 @@ $controller_node_internal      = $controller_node_address
 # This is also known as the Management Interface
 $public_interface        	= 'eth0'
 # Define the interface used for vm networking connectivity when nova-network is being used.
-# Quantum does not required this value, so using eth0 will typically be fine. 
+# Quantum does not require this value, so using eth0 will typically be fine. 
 $private_interface		= 'eth0'
 # Specify the interface used for external connectivity such as floating IPs (only in network/controller node)
 $external_interface	 	= 'eth1'
@@ -128,7 +128,7 @@ $verbose                 = false
 
 # This describes the hardware of the nodes to the extent required to network-install their
 # OS.
-# Change this to suit your hardware; the supplied configuration works for UCSes with CIMC
+# Change this to suit your hardware; the supplied configuration works for UCS models with CIMC
 # using a default password.
 # If you have multiple different hardware types or disk configurations you may need to use
 # multiple block types here.
@@ -155,14 +155,14 @@ define cobbler_node($node_type, $mac, $ip, $power_address, $power_id = undef) {
 node /build-node/ inherits master-node {
 
 # This block defines the control server. Replace "control_server" with the host name of your
-# OpenStack controller, and change the mac to the MAC address of the boot interface of your
-# OpenStack controller. Change the ip to the IP address of your OpenStack controller
+# OpenStack controller, and change the "mac" to the MAC address of the boot interface of your
+# OpenStack controller. Change the "ip" to the IP address of your OpenStack controller
 
   cobbler_node { "control-server": node_type => "control", mac => "00:11:22:33:44:55:66", ip => "192.168.242.10", power_address  => "192.168.242.110" }
 
 # This block defines the first compute server. Replace "compute_server01" with the host name
-# of your first OpenStack compute node, and change the mac to the MAC address of the boot
-# interface of your first OpenStack compute node. Change the ip to the IP address of your first
+# of your first OpenStack compute node, and change the "mac" to the MAC address of the boot
+# interface of your first OpenStack compute node. Change the "ip" to the IP address of your first
 # OpenStack compute node
 
 # Begin compute node
