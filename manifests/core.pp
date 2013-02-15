@@ -116,6 +116,75 @@ node os_base inherits base {
 
 class control($crosstalk_ip) {
 
+    class { 'nrpe':
+        allowed_hosts           => ['127.0.0.1', "$::cobbler_node_ip"]
+    }
+
+    nrpe::command { 'check_ntp_time':
+        ensure          => present,
+        command         => "check_ntp_time -H $::company_ntp_server -w 1 -c 3";
+    }
+
+    nrpe::command { 'check_all_disks':
+        ensure          => present,
+        command         => "check_disk -w '20%' -c '10%' -e";
+    }
+
+    nrpe::command { 'check_load':
+        ensure          => present,
+        command         => "check_load -w '5.0,4.0,3.0' -c '10.0,6.0,4.0'";
+    }
+
+    nrpe::command { 'check_procs':
+        ensure          => present,
+        command         => "check_procs -w '250' -c '400'";
+    }
+
+    nrpe::command { 'check_users':
+        ensure          => present,
+        command         => "check_users -w '10' -c '25'";
+    }
+
+    nrpe::command { 'check_glance1':
+        ensure          => present,
+        command         => "check_glance1 --host $::controller_node_address --auth_url http://$::controller_node_address:5000/v2.0/ --username admin --password $admin_password --tenant openstack --req_count 1 --req_images precise-x86_64";
+    }
+
+    nrpe::command { 'check_keystone':
+        ensure          => present,
+        command         => "check_keystone --auth_url http://$::controller_node_address:5000/v2.0/ --username admin --password $admin_password --tenant openstack volume identity compute image network ec2";
+    }
+
+    nrpe::command { 'check_novaapi':
+        ensure          => present,
+        command         => "check_novaapi --auth_url http://$::controller_node_address:5000/v2.0/ --username admin --password $admin_password --tenant openstack";
+    }
+
+    nrpe::command { 'check_rabbitmq_aliveness':
+        ensure          => present,
+        command         => "check_rabbitmq_aliveness -H $::controller_node_address -u $::rabbit_user -p $::rabbit_password --vhost=/";
+    }
+
+    nrpe::command { 'check_rabbitmq_objects':
+        ensure          => present,
+        command         => "check_rabbitmq_objects -H $::controller_node_address -u $::rabbit_user -p $::rabbit_password";
+    }
+
+    nrpe::command { 'check_rabbitmq_overview':
+        ensure          => present,
+        command         => "check_rabbitmq_overview -H $::controller_node_address -u $::rabbit_user -p $::rabbit_password";
+    }
+
+    nrpe::command { 'check_rabbitmq_server':
+        ensure          => present,
+        command         => "check_rabbitmq_server -H $::controller_node_address -u $::rabbit_user -p $::rabbit_password -n $::controller_hostname";
+    }
+
+    nrpe::command { 'check_rabbitmq_watermark':
+        ensure          => present,
+        command         => "check_rabbitmq_watermark -H $::controller_node_address -u $::rabbit_user -p $::rabbit_password -n $::controller_hostname";
+    }
+
     class { 'openstack::controller':
 	public_address          => $controller_node_public,
 	public_interface        => $public_interface,
@@ -247,6 +316,41 @@ class control($crosstalk_ip) {
 
 
 class compute($internal_ip, $crosstalk_ip) {
+
+    class { 'nrpe':
+        allowed_hosts            => ['127.0.0.1', "$::cobbler_node_ip"]
+    }
+
+    nrpe::command { 'check_ntp_time':
+        ensure          => present,
+        command         => "check_ntp_time -H $::company_ntp_server -w 1 -c 3";
+    }
+
+    nrpe::command { 'check_all_disks':
+        ensure          => present,
+        command         => "check_disk -w '20%' -c '10%' -e";
+    }
+
+    nrpe::command { 'check_load':
+        ensure          => present,
+        command         => "check_load -w '5.0,4.0,3.0' -c '10.0,6.0,4.0'";
+    }
+
+    nrpe::command { 'check_procs':
+        ensure          => present,
+        command         => "check_procs -w '350' -c '500'";
+    }
+
+    nrpe::command { 'check_users':
+        ensure          => present,
+        command         => "check_users -w '10' -c '25'";
+    }
+
+    nrpe::command { 'check_vm':
+        ensure          => present,
+        command         => "check_vm";
+    }
+
 
     class { 'openstack::compute':
 	public_interface   => $public_interface,
