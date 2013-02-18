@@ -11,9 +11,9 @@
 # If you are behind a proxy you may choose not to use our ftp distribution, and
 # instead try our http distribution location. Note the http location is not
 # a permanent location and may change at any time.
-$location 		= "ftp://ftpeng.cisco.com/openstack/cisco"
+#$location 		= "ftp://ftpeng.cisco.com/openstack/cisco"
 # Alternate, uncomment this one, and comment out the one above
-#$location		= "http://128.107.252.163/openstack/cisco"
+$location		= "http://128.107.252.163/openstack/cisco"
 ########### Build Node (Cobbler, Puppet Master, NTP) ######
 # Change the following to the host name you have given your build node
 $build_node_name        = "build-server"
@@ -74,25 +74,39 @@ $controller_hostname           = 'control-server'
 $db_allowed_network            = '192.168.242.%'
 # These next two values typically do not need to be changed. They define the network connectivity
 # of the OpenStack controller
-$controller_node_public        = $controller_node_address
-$controller_node_internal      = $controller_node_address
+$controller_node_external      = $controller_node_address
+$controller_node_management    = $controller_node_address
 
 # These next three parameters specify the networking hardware used in each node
 # Current assumption is that all nodes have the same network interfaces and are
 # cabled identically
 #
 # Specify which interface in each node is the API Interface
-# This is also known as the Management Interface
-$public_interface        	= 'eth0'
-# Define the interface used for vm networking connectivity when nova-network is being used.
-# Quantum does not require this value, so using eth0 will typically be fine. 
-$private_interface		= 'eth0'
-# Specify the interface used for external connectivity such as floating IPs (only in network/controller node)
-$external_interface	 	= 'eth1'
+# This is also known as the Management Interface.
+# Since this is where a management IP will be assigned, it 
+# is also likely the bridge interface (OVS, etc.) on the control/
+# network node.  For OVS single interface instances, this is often
+# "br-ex" or "eth0".
+#
+# NOTE If you overload this interface, you will need to reboot the nodes
+# after the first puppet run.
+$management_interface        	= 'br-ex'
+# Specify the interface used for external connectivity such as floating IPs
+# (only in network/controller node).  This is the physical interface that will be
+# associated with the virrtual switch (such as br-ex, above).  It should 
+# therefore be a physical interface.  If it is different than where the
+# management interface is assigned you will need to add an external
+# route for metadata services and in either case you will loose access
+# to overlapping IPs. This is often "eth1" or "eth0" if the management
+# interface is "br-ex"
+$external_interface	 	= 'eth0'
 
-# Select the drive on which Ubuntu and OpenStack will be installed in each node. Current assumption is
-# that all nodes will be installed on the same device name
-$install_drive           = '/dev/sdc'
+# Select the drive on which Ubuntu and OpenStack will be installed in each 
+# node. Current assumption is that all nodes will be installed on the same
+# device name.  This is most commonly /dev/sda on UCS systems with LSI
+# RAID controllers, and /dev/sdc if a virtual device is associated via
+# UCSM or CIMC interface.
+$install_drive           = '/dev/sda'
 
 ########### OpenStack Service Credentials ############
 # This block of parameters is used to change the user names and passwords used by the services which
@@ -184,6 +198,9 @@ node /build-node/ inherits master-node {
 ### Node types ###
 # These lines specify the host names in your OpenStack cluster and what the function of each host is
 
+# For All-in-One type nodes, you only need this definition:
+
+node all-in-one inherits os_base { class { allinone: } }
 # Change build_server to the host name of your build node
 node build-server inherits build-node { }
 

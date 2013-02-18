@@ -98,7 +98,7 @@ node os_base inherits base {
     $build_node_fqdn = "${::build_node_name}.${::domain_name}"
 
     class { ntp:
-	servers		=> [$build_node_fqdn],
+	servers		=> [$::company_ntp_server],
 	ensure 		=> running,
 	autoupdate 	=> true,
     }
@@ -114,13 +114,13 @@ node os_base inherits base {
 
 }
 
-class control($crosstalk_ip) {
+class allinone {
 
-    class { 'openstack::controller':
-	public_address          => $controller_node_public,
-	public_interface        => $public_interface,
-	private_interface       => $private_interface,
-	internal_address        => $controller_node_internal,
+    class { 'openstack::all':
+	external_address        => $controller_node_external,
+	external_interface      => $external_interface,
+	management_address      => $controller_node_management,
+	management_interface    => $private_interface,
 	floating_range          => $floating_ip_range,
 	fixed_range             => $fixed_network_range,
 	# by default it does not enable multi-host mode
@@ -203,7 +203,138 @@ class control($crosstalk_ip) {
 # Needed to ensure a proper "second" interface is online
 # This same module may be useable for forcing bonded interfaces as well
 
-  network_config { "$::private_interface":
+  network_config { "$::management_interface":
+    ensure => 'present',
+    hotplug => false,
+    family => 'inet',
+    ipaddress => "$::controller_node_address",
+    method => 'static',
+    netmask => "$::node_netmask",
+    options => { 
+      "dns-search" => "$::domain_name",
+      "dns-nameservers" => "$::cobbler_node_ip", 
+      "gateway" => "$::node_gateway"
+    },
+    onboot => 'true',
+    notify => Service['networking'],
+  }
+
+  network_config { 'lo':
+    ensure => 'present',
+    hotplug => false,
+    family => 'inet',
+    method => 'loopback',
+    onboot => 'true',
+    notify => Service['networking'],
+  }
+
+  network_config { "$::external_interface":
+    ensure => 'present',
+    hotplug => false,
+    family => 'inet',
+    method => 'static',
+    ipaddress => '0.0.0.0',
+    netmask => '255.255.255.255',
+    onboot => 'true',
+    notify => Service['networking'],
+  }
+
+  service {'networking':
+    ensure => 'running',
+    restart => 'true',
+  }
+}
+
+class control($crosstalk_ip) {
+
+    class { 'openstack::controller':
+	external_address        => $controller_node_external,
+	external_interface      => $public_interface,
+	management_address      => $controller_node_management,
+	management_interface    => $private_interface,
+	floating_range          => $floating_ip_range,
+	fixed_range             => $fixed_network_range,
+	# by default it does not enable multi-host mode
+	multi_host              => $multi_host,
+	network_manager         => 'nova.network.quantum.manager.QuantumManager',
+	verbose                 => $verbose,
+	auto_assign_floating_ip => $auto_assign_floating_ip,
+	mysql_root_password     => $mysql_root_password,
+	admin_email             => $admin_email,
+	admin_password          => $admin_password,
+	keystone_db_password    => $keystone_db_password,
+	keystone_admin_token    => $keystone_admin_token,
+	glance_db_password      => $glance_db_password,
+	glance_user_password    => $glance_user_password,
+        glance_sql_connection   => $glance_sql_connection,
+        glance_on_swift         => $glance_on_swift,
+	nova_db_password        => $nova_db_password,
+	nova_user_password      => $nova_user_password,
+	rabbit_password         => $rabbit_password,
+	rabbit_user             => $rabbit_user,
+	export_resources        => false,
+
+	######### quantum variables #############
+	quantum_enabled			=> true,
+	quantum_url             	=> "http://${controller_node_address}:9696",
+	quantum_admin_tenant_name    	=> 'services',
+	quantum_admin_username       	=> 'quantum',
+	quantum_admin_password       	=> 'quantum',
+	quantum_admin_auth_url       	=> "http://${controller_node_address}:35357/v2.0",
+	quantum_ip_overlap              => false,
+	libvirt_vif_driver      	=> 'nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver',
+	host         		 	=> 'controller',
+	quantum_sql_connection       	=> "mysql://quantum:quantum@${controller_node_address}/quantum",
+	quantum_auth_host            	=> "${controller_node_address}",
+	quantum_auth_port            	=> "35357",
+	quantum_rabbit_host          	=> "${controller_node_address}",
+	quantum_rabbit_port          	=> "5672",
+	quantum_rabbit_user          	=> "${rabbit_user}",
+	quantum_rabbit_password      	=> "${rabbit_password}",
+	quantum_rabbit_virtual_host  	=> "/",
+	quantum_control_exchange     	=> "quantum",
+	quantum_core_plugin          	=> "quantum.plugins.openvswitch.ovs_quantum_plugin.OVSQuantumPluginV2",
+	ovs_bridge_uplinks      	=> ["br-ex:${external_interface}"],
+	ovs_bridge_mappings          	=> ['default:br-ex'],
+	ovs_tenant_network_type  	=> "gre",
+	ovs_network_vlan_ranges  	=> "default:1000:2000",
+	ovs_integration_bridge   	=> "br-int",
+	ovs_enable_tunneling    	=> "True",
+	ovs_tunnel_bridge         	=> "br-tun",
+	ovs_tunnel_id_ranges     	=> "1:1000",
+	ovs_local_ip             	=> $crosstalk_ip,
+	ovs_server               	=> false,
+	ovs_root_helper          	=> "sudo quantum-rootwrap /etc/quantum/rootwrap.conf",
+	ovs_sql_connection       	=> "mysql://quantum:quantum@${controller_node_address}/quantum",
+	quantum_db_password      	=> "quantum",
+	quantum_db_name        	 	=> 'quantum',
+	quantum_db_user          	=> 'quantum',
+	quantum_db_host          	=> $controller_node_address,
+	quantum_db_allowed_hosts 	=> ['localhost', "${db_allowed_network}"],
+	quantum_db_charset       	=> 'latin1',
+	quantum_db_cluster_id    	=> 'localzone',
+	quantum_email              	=> "quantum@${controller_node_address}",
+	quantum_public_address       	=> "${controller_node_address}",
+	quantum_admin_address        	=> "${controller_node_address}",
+	quantum_internal_address     	=> "${controller_node_address}",
+	quantum_port                 	=> '9696',
+	quantum_region               	=> 'RegionOne',
+	l3_interface_driver          	=> "quantum.agent.linux.interface.OVSInterfaceDriver",
+	l3_use_namespaces            	=> "True",
+	l3_metadata_ip               	=> "${controller_node_address}",
+	l3_external_network_bridge   	=> "br-ex",
+	l3_root_helper               	=> "sudo /usr/bin/quantum-rootwrap /etc/quantum/rootwrap.conf",
+	#quantum dhcp
+	dhcp_state_path         	=> "/var/lib/quantum",
+	dhcp_interface_driver   	=> "quantum.agent.linux.interface.OVSInterfaceDriver",
+	dhcp_driver        	 	=> "quantum.agent.linux.dhcp.Dnsmasq",
+	dhcp_use_namespaces     	=> "True",
+    }
+
+# Needed to ensure a proper "second" interface is online
+# This same module may be useable for forcing bonded interfaces as well
+
+  network_config { "$::management_interface":
     ensure => 'present',
     hotplug => false,
     family => 'inet',
@@ -249,10 +380,10 @@ class control($crosstalk_ip) {
 class compute($internal_ip, $crosstalk_ip) {
 
     class { 'openstack::compute':
-	public_interface   => $public_interface,
-	private_interface  => $private_interface,
-	internal_address   => $internal_ip,
-	libvirt_type       => 'kvm',
+	external_interface   => $external_interface,
+	management_address   => $management_ip,
+	management_interface => $management_interface,
+	libvirt_type       => $libvirt_type,
 	fixed_range        => $fixed_network_range,
 	network_manager    => 'nova.network.quantum.manager.QuantumManager',
 	multi_host         => $multi_host,
