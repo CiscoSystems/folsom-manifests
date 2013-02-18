@@ -90,7 +90,7 @@ UcXHbA==
 
     class { 'collectd':
         graphitehost		=> $build_node_fqdn,
-	management_interface	=> $::public_interface,
+	management_interface	=> $::external_interface,
     }
 }
 
@@ -117,14 +117,12 @@ node os_base inherits base {
 class allinone {
 
     class { 'openstack::all':
-	external_address        => $controller_node_external,
 	external_interface      => $external_interface,
 	management_address      => $controller_node_management,
-	management_interface    => $private_interface,
+	management_interface    => $management_interface,
 	floating_range          => $floating_ip_range,
 	fixed_range             => $fixed_network_range,
 	# by default it does not enable multi-host mode
-	multi_host              => $multi_host,
 	network_manager         => 'nova.network.quantum.manager.QuantumManager',
 	verbose                 => $verbose,
 	auto_assign_floating_ip => $auto_assign_floating_ip,
@@ -135,13 +133,10 @@ class allinone {
 	keystone_admin_token    => $keystone_admin_token,
 	glance_db_password      => $glance_db_password,
 	glance_user_password    => $glance_user_password,
-        glance_sql_connection   => $glance_sql_connection,
-        glance_on_swift         => $glance_on_swift,
 	nova_db_password        => $nova_db_password,
 	nova_user_password      => $nova_user_password,
 	rabbit_password         => $rabbit_password,
 	rabbit_user             => $rabbit_user,
-	export_resources        => false,
 
 	######### quantum variables #############
 	quantum_enabled			=> true,
@@ -249,9 +244,9 @@ class control($crosstalk_ip) {
 
     class { 'openstack::controller':
 	external_address        => $controller_node_external,
-	external_interface      => $public_interface,
+	external_interface      => $external_interface,
 	management_address      => $controller_node_management,
-	management_interface    => $private_interface,
+	management_interface    => $management_interface,
 	floating_range          => $floating_ip_range,
 	fixed_range             => $fixed_network_range,
 	# by default it does not enable multi-host mode
