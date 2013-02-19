@@ -2,6 +2,7 @@ apache
 apt
 apt-cacher-ng
 cobbler
+coe
 collectd
 concat
 corosync
