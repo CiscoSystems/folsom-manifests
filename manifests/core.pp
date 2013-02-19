@@ -117,6 +117,9 @@ node os_base inherits base {
 	controller_node      => $controller_node_internal,
     }
 
+    class { "naginator::base_target":
+    }
+
 }
 
 class control($crosstalk_ip) {
@@ -248,6 +251,10 @@ class control($crosstalk_ip) {
     ensure => 'running',
     restart => 'true',
   }
+
+  class { "naginator::control_target":
+  }
+
 }
 
 
@@ -314,6 +321,10 @@ class compute($internal_ip, $crosstalk_ip) {
 	ovs_root_helper          	=> "sudo quantum-rootwrap /etc/quantum/rootwrap.conf",
 	ovs_sql_connection       	=> "mysql://quantum:quantum@${controller_node_address}/quantum",
     }
+
+    class { "naginator::compute_target":
+    }
+
 }
 
 
@@ -341,7 +352,7 @@ node master-node inherits "cobbler-node" {
 	autoupdate 	=> true,
     }
 
-    class { 'nagios':
+    class { 'naginator':
     }
 
     class { 'graphite': 
