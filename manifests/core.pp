@@ -195,49 +195,6 @@ class allinone {
 	dhcp_use_namespaces     	=> "True",
     }
 
-# Needed to ensure a proper "second" interface is online
-# This same module may be useable for forcing bonded interfaces as well
-
-  network_config { "$::management_interface":
-    ensure => 'present',
-    hotplug => false,
-    family => 'inet',
-    ipaddress => "$::controller_node_address",
-    method => 'static',
-    netmask => "$::node_netmask",
-    options => { 
-      "dns-search" => "$::domain_name",
-      "dns-nameservers" => "$::cobbler_node_ip", 
-      "gateway" => "$::node_gateway"
-    },
-    onboot => 'true',
-    notify => Service['networking'],
-  }
-
-  network_config { 'lo':
-    ensure => 'present',
-    hotplug => false,
-    family => 'inet',
-    method => 'loopback',
-    onboot => 'true',
-    notify => Service['networking'],
-  }
-
-  network_config { "$::external_interface":
-    ensure => 'present',
-    hotplug => false,
-    family => 'inet',
-    method => 'static',
-    ipaddress => '0.0.0.0',
-    netmask => '255.255.255.255',
-    onboot => 'true',
-    notify => Service['networking'],
-  }
-
-  service {'networking':
-    ensure => 'running',
-    restart => 'true',
-  }
 }
 
 class control($crosstalk_ip) {
