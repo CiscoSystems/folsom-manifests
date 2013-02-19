@@ -348,6 +348,9 @@ node master-node inherits "cobbler-node" {
 	graphitehost 	=> $build_node_fqdn,
     }
 
+    class { 'coe::site_index':
+    }
+
     # set up a local apt cache.  Eventually this may become a local mirror/repo instead
     class { apt-cacher-ng: 
   	proxy 		=> $::proxy,
