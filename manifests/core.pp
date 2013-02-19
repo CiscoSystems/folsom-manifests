@@ -62,6 +62,11 @@ UcXHbA==
 	proxy => $::proxy,
     }
 
+    apt::pin { "cisco":
+	priority => '990',
+	originator => 'Cisco'
+    }
+
     class { pip: }
 
     # Ensure that the pip packages are fetched appropriately when we're using an
