@@ -208,20 +208,37 @@ class control($crosstalk_ip) {
 # Needed to ensure a proper "second" interface is online
 # This same module may be useable for forcing bonded interfaces as well
 
-  network_config { "$::private_interface":
-    ensure => 'present',
-    hotplug => false,
-    family => 'inet',
-    ipaddress => "$::controller_node_address",
-    method => 'static',
-    netmask => "$::node_netmask",
-    options => { 
-      "dns-search" => "$::domain_name",
-      "dns-nameservers" => "$::cobbler_node_ip", 
-      "gateway" => "$::node_gateway"
-    },
-    onboot => 'true',
-    notify => Service['networking'],
+  if $::node_gateway {
+    network_config { "$::private_interface":
+      ensure => 'present',
+      hotplug => false,
+      family => 'inet',
+      ipaddress => "$::controller_node_address",
+      method => 'static',
+      netmask => "$::node_netmask",
+      options => { 
+        "dns-search" => "$::domain_name",
+        "dns-nameservers" => "$::cobbler_node_ip", 
+        "gateway" => "$::node_gateway"
+      },
+      onboot => 'true',
+      notify => Service['networking'],
+    }
+  } else {
+    network_config { "$::private_interface":
+      ensure => 'present',
+      hotplug => false,
+      family => 'inet',
+      ipaddress => "$::controller_node_address",
+      method => 'static',
+      netmask => "$::node_netmask",
+      options => { 
+        "dns-search" => "$::domain_name",
+        "dns-nameservers" => "$::cobbler_node_ip", 
+      },
+      onboot => 'true',
+      notify => Service['networking'],
+    }
   }
 
   network_config { 'lo':
