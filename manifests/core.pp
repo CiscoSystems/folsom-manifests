@@ -125,6 +125,7 @@ class allinone {
 	# by default it does not enable multi-host mode
 	network_manager         => 'nova.network.quantum.manager.QuantumManager',
 	verbose                 => $verbose,
+	libvirt_type            => $libvirt_type,
 	auto_assign_floating_ip => $auto_assign_floating_ip,
 	mysql_root_password     => $mysql_root_password,
 	admin_email             => $admin_email,
