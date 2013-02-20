@@ -169,7 +169,18 @@ define cobbler_node($node_type, $mac, $ip, $power_address, $power_id = undef) {
   }
 }
 
-node /build-node/ inherits master-node {
+################################## Node types #####################################
+###################################################################################
+
+# These lines specify the host names in your OpenStack cluster and what the function of each host is
+# The exception is the build node which was defined in the previous section
+
+############## BUILD NODE #######################
+# Rename the build-node to your build-server name (as defined
+# in the build_node_name variable defined at the top of the file
+# this is needed because puppet does not handle variables in the node
+# definition match parameter
+node /build-node/ inherits cobbler-base {
 
 # This block defines the control server. Replace "control_server" with the host name of your
 # OpenStack controller, and change the "mac" to the MAC address of the boot interface of your
@@ -182,8 +193,8 @@ node /build-node/ inherits master-node {
 # interface of your first OpenStack compute node. Change the "ip" to the IP address of your first
 # OpenStack compute node
 
-# Begin compute node
   cobbler_node { "compute-server01": node_type => "compute", mac => "11:22:33:44:55:66:77", ip => "192.168.242.21", power_address  => "192.168.242.121" }
+
 # Example with UCS blade power_address with a sub-group (in UCSM), and a ServiceProfile for power_id
 # you will need to change power type to 'USC' in the define macro above 
 #  cobbler_node { "compute-server01": node_type => "compute", mac => "11:22:33:44:55:66:77", ip => "192.168.242.21", power_address  => "192.168.242.121:org-cisco", power_id => "OpenStack-1" }
@@ -194,32 +205,27 @@ node /build-node/ inherits master-node {
 # and paste the copy in this section. Be sure to change the host name, mac, ip, and power settings
 # for each node 
 
-
 ### End repeated nodes ###
 }
 
-### Node types ###
-# These lines specify the host names in your OpenStack cluster and what the function of each host is
+############# ALL-IN-ONE #################################
+# For All-in-One type nodes, you only need this definition to match
+# the hostnmae of your node.  Your build-node above should _not_ match
+# as this is already accomplished through this definiton
 
-# For All-in-One type nodes, you only need this definition:
+node all-in-one inherits build-base { class { allinone: } }
 
-node all-in-one inherits os_base { class { allinone: } }
-# Change build_server to the host name of your build node
-node build-server inherits build-node { }
-
+############# CONTROL SERVER ##############################
 # Change control_server to the host name of your control node
-node control-server inherits os_base { class { control: crosstalk_ip => '192.168.242.10'} }
+node control-server inherits base { class { control: crosstalk_ip => '192.168.242.10'} }
 
+############# COMPUTE SERVER ################################
+############# Repeat as needed ##############################
 # Change compute_server01 to the host name of your first compute node
-node compute-server01 inherits os_base { class { compute: internal_ip => '192.168.242.21', crosstalk_ip => '192.168.242.21'} }
+node compute-server01 inherits base { class { compute: internal_ip => '192.168.242.21', crosstalk_ip => '192.168.242.21'} }
 
-### Repeat as needed ###
-# Copy the compute_server01 line above and paste a copy here for each additional OpenStack node in
-# your cluster. Be sure to replace the compute_server01 parameter with the correct host name for
-# each additional node
-
-
-### End repeated nodes ###
+# Be sure to replace the compute_server01 parameter with the correct host name for
+# each additional compute node
 
 ########################################################################
 ### All parameters below this point likely do not need to be changed ###
