@@ -110,7 +110,7 @@ $install_drive           = '/dev/sda'
 
 # Select the type of libvirt driver, kvm for bare metal (or v-in-v 
 # capable systmes) or choose qemu for paravirtualized layers.
-$libvirt_type               = '/dev/kvm'
+$libvirt_type               = 'kvm'
 ########### OpenStack Service Credentials ############
 # This block of parameters is used to change the user names and passwords used by the services which
 # make up OpenStack. The following defaults should be changed for any production deployment
