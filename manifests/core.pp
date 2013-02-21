@@ -494,7 +494,7 @@ node build-base inherits base {
     }
 }
 
-node base-cobbler inherits build-base {
+node cobbler-base inherits build-base {
 
 ####### Shared Variables from Site.pp #######
 $cobbler_node_fqdn              = "${::build_node_name}.${::domain_name}"

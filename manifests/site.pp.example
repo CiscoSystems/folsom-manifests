@@ -242,7 +242,6 @@ $dhcp_service 	= "dnsmasq"
 
 ### Puppet Parameters ###
 # These settings load other puppet components. They should not be changed
-import 'cobbler-node'
 import 'core'
 
 ## Define the default node, to capture any un-defined nodes that register
