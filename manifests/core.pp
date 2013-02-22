@@ -122,7 +122,7 @@ UcXHbA==
 	controller_node      => $controller_node_management,
     }
     
-    class { 'sshroot': ensure => 'present' }
+    #class { 'sshroot': ensure => 'present' }
 
 }
 
