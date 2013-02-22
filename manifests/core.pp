@@ -537,8 +537,8 @@ class { cobbler:
   node_subnet           => $::node_subnet,
   node_netmask          => $::node_netmask,
   node_gateway          => $::node_gateway,
-  node_dns              => $::node_dns,
-  ip                    => $::ip,
+  node_dns              => $::cobbler_node_ip,
+  ip                    => $::cobbler_node_ip,
   dns_service           => $::dns_service,
   dhcp_service          => $::dhcp_service,
 # change these two if a dynamic DHCP pool is needed
