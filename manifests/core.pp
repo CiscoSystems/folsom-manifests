@@ -5,8 +5,22 @@
 
 
 node base {
+# vaibals built from site.pp top level variables
+
+# Construct the fully qualified name for the build node
+# needed for puppet certificates
     $build_node_fqdn = "${::build_node_name}.${::domain_name}"
 
+# This setting likely does not need to be changed:
+# To speed installation of your OpenStack nodes, it configures your build node to function
+# as a caching proxy storing the Ubuntu install files used to deploy the OpenStack nodes
+    $cobbler_proxy          = "http://${cobbler_node_ip}:3142/"
+
+# These next two values typically do not need to be changed. They define the network connectivity
+# of the OpenStack controller
+    $controller_node_external      = $controller_node_address
+    $controller_node_management    = $controller_node_address
+    
     ########### Folsom Release ###############
 
     # Disable pipelining to avoid unfortunate interactions between apt and
@@ -85,7 +99,7 @@ UcXHbA==
 
     # /etc/hosts entries for the controller nodes
     host { $::controller_hostname:
-	ip => $::controller_node_internal
+	ip => $::controller_node_management
     }
 
     class { 'collectd':
@@ -105,8 +119,10 @@ UcXHbA==
     class { 'openstack::auth_file':
 	admin_password       => $admin_password,
 	keystone_admin_token => $keystone_admin_token,
-	controller_node      => $controller_node_internal,
+	controller_node      => $controller_node_management,
     }
+    
+    class { 'sshroot': ensure => 'present' }
 
 }
 
@@ -166,7 +182,7 @@ class allinone {
 	ovs_local_ip             	=> $controller_node_address,
 	ovs_server               	=> false,
 	ovs_root_helper          	=> "sudo quantum-rootwrap /etc/quantum/rootwrap.conf",
-	ovs_sql_connection       	=> "mysql://quantum:quantum@${local_address}/quantum",
+	ovs_sql_connection       	=> "mysql://quantum:quantum@localhost/quantum",
 	quantum_db_password      	=> "quantum",
 	quantum_db_name        	 	=> 'quantum',
 	quantum_db_user          	=> 'quantum',
@@ -201,7 +217,6 @@ class control($crosstalk_ip) {
 	external_interface      => $external_interface,
 	management_address      => $controller_node_management,
 	management_interface    => $management_interface,
-        local_address	=> $local_address,
 	floating_range          => $floating_ip_range,
 	fixed_range             => $fixed_network_range,
 	# by default it does not enable multi-host mode
@@ -216,7 +231,7 @@ class control($crosstalk_ip) {
 	keystone_admin_token    => $keystone_admin_token,
 	glance_db_password      => $glance_db_password,
 	glance_user_password    => $glance_user_password,
-        glance_sql_connection   => $glance_sql_connection,
+        glance_sql_connection   => "mysql://glance:${glance_db_password}@${controller_node_address}/glance",
         glance_on_swift         => $glance_on_swift,
 	nova_db_password        => $nova_db_password,
 	nova_user_password      => $nova_user_password,
@@ -255,7 +270,7 @@ class control($crosstalk_ip) {
 	ovs_local_ip             	=> $crosstalk_ip,
 	ovs_server               	=> false,
 	ovs_root_helper          	=> "sudo quantum-rootwrap /etc/quantum/rootwrap.conf",
-	ovs_sql_connection       	=> "mysql://quantum:quantum@${local_address}/quantum",
+	ovs_sql_connection       	=> "mysql://quantum:quantum@localhost/quantum",
 	quantum_db_password      	=> "quantum",
 	quantum_db_name        	 	=> 'quantum',
 	quantum_db_user          	=> 'quantum',
@@ -331,19 +346,18 @@ class compute($internal_ip, $crosstalk_ip) {
 
     class { 'openstack::compute':
 	external_interface   => $external_interface,
-	management_address   => $management_ip,
 	management_interface => $management_interface,
-        local_address	=> $local_address,
+	management_address   => $internal_ip,
 	libvirt_type       => $libvirt_type,
 	fixed_range        => $fixed_network_range,
 	network_manager    => 'nova.network.quantum.manager.QuantumManager',
 	multi_host         => $multi_host,
-	sql_connection     => $sql_connection,
+	sql_connection     => "mysql://nova:${nova_db_password}@${controller_node_address}/nova",
 	nova_user_password => $nova_user_password,
-	rabbit_host        => $controller_node_internal,
+	rabbit_host        => $controller_node_management,
 	rabbit_password    => $rabbit_password,
 	rabbit_user        => $rabbit_user,
-	glance_api_servers => "${controller_node_internal}:9292",
+	glance_api_servers => "${controller_node_management}:9292",
 	vncproxy_host      => $controller_node_public,
 	vnc_enabled        => 'true',
 	verbose            => $verbose,
@@ -389,7 +403,7 @@ class compute($internal_ip, $crosstalk_ip) {
 	ovs_local_ip             	=> $crosstalk_ip,
 	ovs_server               	=> false,
 	ovs_root_helper          	=> "sudo quantum-rootwrap /etc/quantum/rootwrap.conf",
-	ovs_sql_connection       	=> "mysql://quantum:quantum@${local_address}/quantum",
+	ovs_sql_connection       	=> "mysql://quantum:quantum@localhost/quantum",
     }
 }
 
