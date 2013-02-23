@@ -231,7 +231,21 @@ node compute-server01 inherits base { class { compute: internal_ip => '192.168.2
 ########################################################################
 
 ### Advanced Users Configuration ###
-# These four settings typically do not need to be changed
+# These settings typically do not need to be changed
+
+# Construct the fully qualified name for the build node
+# needed for puppet certificates
+    $build_node_fqdn = "${::build_node_name}.${::domain_name}"
+
+# This setting likely does not need to be changed:
+# To speed installation of your OpenStack nodes, it configures your build node to function
+# as a caching proxy storing the Ubuntu install files used to deploy the OpenStack nodes
+    $cobbler_proxy          = "http://${cobbler_node_ip}:3142/"
+
+# These next two values typically do not need to be changed. They define the network connectivity
+# of the OpenStack controller
+    $controller_node_external      = $controller_node_address
+    $controller_node_management    = $controller_node_address
 # In the default deployment, the build node functions as the DNS and static DHCP server for
 # the OpenStack nodes. These settings can be used if alternate configurations are needed
 $dns_service 	= "dnsmasq"

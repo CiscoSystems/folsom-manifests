@@ -5,22 +5,6 @@
 
 
 node base {
-# vaibals built from site.pp top level variables
-
-# Construct the fully qualified name for the build node
-# needed for puppet certificates
-    $build_node_fqdn = "${::build_node_name}.${::domain_name}"
-
-# This setting likely does not need to be changed:
-# To speed installation of your OpenStack nodes, it configures your build node to function
-# as a caching proxy storing the Ubuntu install files used to deploy the OpenStack nodes
-    $cobbler_proxy          = "http://${cobbler_node_ip}:3142/"
-
-# These next two values typically do not need to be changed. They define the network connectivity
-# of the OpenStack controller
-    $controller_node_external      = $controller_node_address
-    $controller_node_management    = $controller_node_address
-    
     ########### Folsom Release ###############
 
     # Disable pipelining to avoid unfortunate interactions between apt and
