@@ -60,6 +60,11 @@ UcXHbA==
 	proxy => $::proxy,
     }
 
+    apt::pin { "cisco":
+	priority => '990',
+	originator => 'Cisco'
+    }
+
     class { pip: }
 
     # Ensure that the pip packages are fetched appropriately when we're using an
@@ -192,6 +197,9 @@ class allinone {
 	dhcp_use_namespaces     	=> "True",
     }
 
+    class { "naginator::base_target":
+    }
+
 }
 
 class control($crosstalk_ip) {
@@ -283,20 +291,37 @@ class control($crosstalk_ip) {
 # Needed to ensure a proper "second" interface is online
 # This same module may be useable for forcing bonded interfaces as well
 
-  network_config { "$::management_interface":
-    ensure => 'present',
-    hotplug => false,
-    family => 'inet',
-    ipaddress => "$::controller_node_address",
-    method => 'static',
-    netmask => "$::node_netmask",
-    options => { 
-      "dns-search" => "$::domain_name",
-      "dns-nameservers" => "$::cobbler_node_ip", 
-      "gateway" => "$::node_gateway"
-    },
-    onboot => 'true',
-    notify => Service['networking'],
+  if $::node_gateway {
+    network_config { "$::private_interface":
+      ensure => 'present',
+      hotplug => false,
+      family => 'inet',
+      ipaddress => "$::controller_node_address",
+      method => 'static',
+      netmask => "$::node_netmask",
+      options => { 
+        "dns-search" => "$::domain_name",
+        "dns-nameservers" => "$::cobbler_node_ip", 
+        "gateway" => "$::node_gateway"
+      },
+      onboot => 'true',
+      notify => Service['networking'],
+    }
+  } else {
+    network_config { "$::private_interface":
+      ensure => 'present',
+      hotplug => false,
+      family => 'inet',
+      ipaddress => "$::controller_node_address",
+      method => 'static',
+      netmask => "$::node_netmask",
+      options => { 
+        "dns-search" => "$::domain_name",
+        "dns-nameservers" => "$::cobbler_node_ip", 
+      },
+      onboot => 'true',
+      notify => Service['networking'],
+    }
   }
 
   network_config { 'lo':
@@ -323,6 +348,10 @@ class control($crosstalk_ip) {
     ensure => 'running',
     restart => 'true',
   }
+
+  class { "naginator::control_target":
+  }
+
 }
 
 
@@ -389,6 +418,10 @@ class compute($internal_ip, $crosstalk_ip) {
 	ovs_root_helper          	=> "sudo quantum-rootwrap /etc/quantum/rootwrap.conf",
 	ovs_sql_connection       	=> "mysql://quantum:quantum@localhost/quantum",
     }
+
+    class { "naginator::compute_target":
+    }
+
 }
 
 
@@ -400,7 +433,7 @@ class compute($internal_ip, $crosstalk_ip) {
 
 node build-base inherits base {
 
-    class { 'nagios':
+    class { 'naginator':
     }
 
     class { 'graphite': 

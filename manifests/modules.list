@@ -16,7 +16,7 @@ keystone
 memcached
 monit
 mysql
-nagios
+naginator
 nova
 ntp
 openstack
