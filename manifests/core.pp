@@ -187,7 +187,7 @@ class allinone {
 	quantum_region               	=> 'RegionOne',
 	l3_interface_driver          	=> "quantum.agent.linux.interface.OVSInterfaceDriver",
 	l3_use_namespaces            	=> "True",
-	l3_metadata_ip               	=> "${controller_node_address}",
+	l3_metadata_ip               	=> "${controller_node_external}",
 	l3_external_network_bridge   	=> "br-ex",
 	l3_root_helper               	=> "sudo /usr/bin/quantum-rootwrap /etc/quantum/rootwrap.conf",
 	#quantum dhcp
@@ -278,7 +278,7 @@ class control($crosstalk_ip) {
 	quantum_region               	=> 'RegionOne',
 	l3_interface_driver          	=> "quantum.agent.linux.interface.OVSInterfaceDriver",
 	l3_use_namespaces            	=> "True",
-	l3_metadata_ip               	=> "${controller_node_address}",
+	l3_metadata_ip               	=> "${controller_node_external}",
 	l3_external_network_bridge   	=> "br-ex",
 	l3_root_helper               	=> "sudo /usr/bin/quantum-rootwrap /etc/quantum/rootwrap.conf",
 	#quantum dhcp
