@@ -22,7 +22,7 @@ node base {
     # Load apt prerequisites.  This is only valid on Ubuntu systmes
 
     apt::source { "cisco-openstack-mirror_folsom":
-	location => $::location, 
+	location => "$::location", 
 	release => "folsom",
 	repos => "main",
 	key => "E8CC67053ED3B199",
@@ -87,17 +87,17 @@ UcXHbA==
 
 
     # /etc/hosts entries for the controller nodes
-    host { $::controller_hostname:
-	ip => $::controller_node_management
+    host { "$::controller_hostname":
+	ip => "$::controller_node_management"
     }
 
     class { 'collectd':
-        graphitehost		=> $build_node_fqdn,
-	management_interface	=> $::external_interface,
+        graphitehost		=> "$::build_node_fqdn",
+	management_interface	=> "$::external_interface",
     }
 
     class { ntp:
-	servers		=> [$::company_ntp_server],
+	servers		=> ["$::company_ntp_server"],
 	ensure 		=> running,
 	autoupdate 	=> true,
     }
@@ -111,7 +111,7 @@ UcXHbA==
 	controller_node      => $controller_node_management,
     }
     
-    #class { 'sshroot': ensure => 'present' }
+    class { 'sshroot': ensure => 'present' }
 
 }
 
@@ -292,7 +292,7 @@ class control($crosstalk_ip) {
 # This same module may be useable for forcing bonded interfaces as well
 
   if $::node_gateway {
-    network_config { "$::private_interface":
+    network_config { "$::management_interface":
       ensure => 'present',
       hotplug => false,
       family => 'inet',
@@ -308,7 +308,7 @@ class control($crosstalk_ip) {
       notify => Service['networking'],
     }
   } else {
-    network_config { "$::private_interface":
+    network_config { "$::management_interface":
       ensure => 'present',
       hotplug => false,
       family => 'inet',
@@ -437,7 +437,7 @@ node build-base inherits base {
     }
 
     class { 'graphite': 
-	graphitehost 	=> $build_node_fqdn,
+	graphitehost 	=> "$build_node_fqdn",
     }
 
     # set up a local apt cache.  Eventually this may become a local mirror/repo instead
