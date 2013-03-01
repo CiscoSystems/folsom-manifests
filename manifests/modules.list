@@ -5,7 +5,6 @@ cobbler
 collectd
 concat
 corosync
-create_resources
 dnsmasq
 drbd
 glance
@@ -13,6 +12,7 @@ graphite
 horizon
 inifile
 keystone
+lvm
 memcached
 monit
 mysql
@@ -20,7 +20,7 @@ naginator
 nova
 ntp
 openstack
-openstack_admin
+openstack-admin
 pip
 puppet
 quantum
