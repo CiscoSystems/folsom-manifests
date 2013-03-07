@@ -69,15 +69,4 @@ fi
 apt-get update
 
 # Now start installing modules.
-awk '{ printf "puppet-%s ", $0 }' modules.list  | xargs apt-get install
-#print "apt-get install $lines"
-#while IFS= read -r module
-#do
-#        # display $line or do somthing with $line
-#	 echo "puppet-${module}"
-#        #apt-get install "puppet-${module}"
-#done <"$FILE_LIST"
-
-# TODO: This module does not follow the naming "puppet-module" convention
-echo "puppetlabs-lvm"
-#apt-get install puppetlabs-lvm
+awk '{ printf "puppet-%s ", $0 }' modules.list  | xargs apt-get install puppetlabs-lvm
