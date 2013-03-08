@@ -6,7 +6,6 @@ coe
 collectd
 concat
 corosync
-create_resources
 dnsmasq
 drbd
 glance
@@ -21,7 +20,7 @@ naginator
 nova
 ntp
 openstack
-openstack_admin
+openstack-admin
 pip
 puppet
 quantum
