@@ -12,7 +12,6 @@ graphite
 horizon
 inifile
 keystone
-lvm
 memcached
 monit
 mysql
