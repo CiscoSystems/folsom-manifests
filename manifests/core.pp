@@ -225,7 +225,7 @@ class control($crosstalk_ip) {
         "gateway" => "$::node_gateway"
       },
       onboot => 'true',
-      notify => Service['networking'],
+      notify => Exec['networking-restart'],
     }
   } else {
     network_config { "$::private_interface":
@@ -240,7 +240,7 @@ class control($crosstalk_ip) {
         "dns-nameservers" => "$::cobbler_node_ip", 
       },
       onboot => 'true',
-      notify => Service['networking'],
+      notify => Exec['networking-restart'],
     }
   }
 
@@ -250,7 +250,7 @@ class control($crosstalk_ip) {
     family => 'inet',
     method => 'loopback',
     onboot => 'true',
-    notify => Service['networking'],
+    notify => Exec['networking-restart'],
   }
 
   network_config { "$::external_interface":
@@ -261,12 +261,13 @@ class control($crosstalk_ip) {
     ipaddress => '0.0.0.0',
     netmask => '255.255.255.255',
     onboot => 'true',
-    notify => Service['networking'],
+    notify => Exec['networking-restart'],
   }
 
-  service {'networking':
-    ensure => 'running',
-    restart => 'true',
+  exec {'networking-restart':
+    command     => '/etc/init.d/networking restart',
+    path        => '/usr/bin:/usr/sbin:/bin/sbin',
+    refreshonly => true,
   }
 
   class { "naginator::control_target":
