@@ -69,4 +69,4 @@ fi
 apt-get update
 
 # Now start installing modules.
-awk '{ printf "puppet-%s ", $0 }' modules.list  | xargs apt-get install puppetlabs-lvm
+awk '{ printf "puppet-%s ", $0 }' modules.list  | xargs apt-get install
