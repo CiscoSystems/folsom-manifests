@@ -16,7 +16,7 @@
 #      not wish to (yet) use the latest stable updates.
 #      Example: "folsom/snapshots/2012.2.2"
 echo "Getting Puppet Modules"
-REPO_NAME=folsom-proposed
+REPO_NAME=folsom
 FILE_LIST=modules.list
 REPO=https://github.com/CiscoSystems/
 PUPPET_PATH=/etc/puppet/
