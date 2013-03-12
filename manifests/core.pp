@@ -5,8 +5,6 @@
 
 
 node base {
-    $build_node_fqdn = "${::build_node_name}.${::domain_name}"
-
     ########### Folsom Release ###############
 
     # Disable pipelining to avoid unfortunate interactions between apt and
@@ -24,7 +22,7 @@ node base {
     # Load apt prerequisites.  This is only valid on Ubuntu systmes
 
     apt::source { "cisco-openstack-mirror_folsom":
-	location => $::location, 
+	location => "$::location", 
 	release => "folsom",
 	repos => "main",
 	key => "E8CC67053ED3B199",
@@ -89,21 +87,17 @@ UcXHbA==
 
 
     # /etc/hosts entries for the controller nodes
-    host { $::controller_hostname:
-	ip => $::controller_node_internal
+    host { "$::controller_hostname":
+	ip => "$::controller_node_management"
     }
 
     class { 'collectd':
-        graphitehost		=> $build_node_fqdn,
-	management_interface	=> $::public_interface,
+        graphitehost		=> "$::build_node_fqdn",
+	management_interface	=> "$::external_interface",
     }
-}
-
-node os_base inherits base {
-    $build_node_fqdn = "${::build_node_name}.${::domain_name}"
 
     class { ntp:
-	servers		=> [$build_node_fqdn],
+	servers		=> ["$::company_ntp_server"],
 	ensure 		=> running,
 	autoupdate 	=> true,
     }
@@ -114,7 +108,93 @@ node os_base inherits base {
     class { 'openstack::auth_file':
 	admin_password       => $admin_password,
 	keystone_admin_token => $keystone_admin_token,
-	controller_node      => $controller_node_internal,
+	controller_node      => $controller_node_management,
+    }
+    
+    #class { 'sshroot': ensure => 'present' }
+
+}
+
+class allinone {
+
+    class { 'openstack::all':
+	external_interface      => $external_interface,
+	management_address      => $controller_node_management,
+	management_interface    => $management_interface,
+        local_address		=> $local_address,
+	floating_range          => $floating_ip_range,
+	fixed_range             => $fixed_network_range,
+	# by default it does not enable multi-host mode
+	network_manager         => 'nova.network.quantum.manager.QuantumManager',
+	verbose                 => $verbose,
+	libvirt_type            => $libvirt_type,
+	auto_assign_floating_ip => $auto_assign_floating_ip,
+	mysql_root_password     => $mysql_root_password,
+	admin_email             => $admin_email,
+	admin_password          => $admin_password,
+	keystone_db_password    => $keystone_db_password,
+	keystone_admin_token    => $keystone_admin_token,
+	glance_db_password      => $glance_db_password,
+	glance_user_password    => $glance_user_password,
+	nova_db_password        => $nova_db_password,
+	nova_user_password      => $nova_user_password,
+	rabbit_password         => $rabbit_password,
+	rabbit_user             => $rabbit_user,
+
+	######### quantum variables #############
+	quantum_enabled			=> true,
+	quantum_url             	=> "http://${controller_node_address}:9696",
+	quantum_admin_tenant_name    	=> 'services',
+	quantum_admin_username       	=> 'quantum',
+	quantum_admin_password       	=> 'quantum',
+	quantum_admin_auth_url       	=> "http://${controller_node_address}:35357/v2.0",
+	quantum_ip_overlap              => false,
+	libvirt_vif_driver      	=> 'nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver',
+	quantum_sql_connection       	=> "mysql://quantum:quantum@${local_address}/quantum",
+	quantum_auth_host            	=> "${controller_node_address}",
+	quantum_auth_port            	=> "35357",
+	quantum_rabbit_host          	=> "${controller_node_address}",
+	quantum_rabbit_port          	=> "5672",
+	quantum_rabbit_user          	=> "${rabbit_user}",
+	quantum_rabbit_password      	=> "${rabbit_password}",
+	quantum_rabbit_virtual_host  	=> "/",
+	quantum_control_exchange     	=> "quantum",
+	quantum_core_plugin          	=> "quantum.plugins.openvswitch.ovs_quantum_plugin.OVSQuantumPluginV2",
+	ovs_bridge_uplinks      	=> ["br-ex:${external_interface}"],
+	ovs_bridge_mappings          	=> ['default:br-ex'],
+	ovs_tenant_network_type  	=> "gre",
+	ovs_network_vlan_ranges  	=> "default:1000:2000",
+	ovs_integration_bridge   	=> "br-int",
+	ovs_enable_tunneling    	=> "True",
+	ovs_tunnel_bridge         	=> "br-tun",
+	ovs_tunnel_id_ranges     	=> "1:1000",
+	ovs_local_ip             	=> $controller_node_address,
+	ovs_server               	=> false,
+	ovs_root_helper          	=> "sudo quantum-rootwrap /etc/quantum/rootwrap.conf",
+	ovs_sql_connection       	=> "mysql://quantum:quantum@localhost/quantum",
+	quantum_db_password      	=> "quantum",
+	quantum_db_name        	 	=> 'quantum',
+	quantum_db_user          	=> 'quantum',
+	quantum_db_host          	=> $controller_node_address,
+	quantum_db_allowed_hosts 	=> ['localhost', "${db_allowed_network}"],
+	quantum_db_charset       	=> 'latin1',
+	quantum_db_cluster_id    	=> 'localzone',
+	quantum_email              	=> "quantum@${controller_node_address}",
+	quantum_public_address       	=> "${controller_node_address}",
+	quantum_admin_address        	=> "${controller_node_address}",
+	quantum_internal_address     	=> "${controller_node_address}",
+	quantum_port                 	=> '9696',
+	quantum_region               	=> 'RegionOne',
+	l3_interface_driver          	=> "quantum.agent.linux.interface.OVSInterfaceDriver",
+	l3_use_namespaces            	=> "True",
+	l3_metadata_ip               	=> "${controller_node_external}",
+	l3_external_network_bridge   	=> "br-ex",
+	l3_root_helper               	=> "sudo /usr/bin/quantum-rootwrap /etc/quantum/rootwrap.conf",
+	#quantum dhcp
+	dhcp_state_path         	=> "/var/lib/quantum",
+	dhcp_interface_driver   	=> "quantum.agent.linux.interface.OVSInterfaceDriver",
+	dhcp_driver        	 	=> "quantum.agent.linux.dhcp.Dnsmasq",
+	dhcp_use_namespaces     	=> "True",
     }
 
     class { "naginator::base_target":
@@ -125,10 +205,10 @@ node os_base inherits base {
 class control($crosstalk_ip) {
 
     class { 'openstack::controller':
-	public_address          => $controller_node_public,
-	public_interface        => $public_interface,
-	private_interface       => $private_interface,
-	internal_address        => $controller_node_internal,
+	external_address        => $controller_node_external,
+	external_interface      => $external_interface,
+	management_address      => $controller_node_management,
+	management_interface    => $management_interface,
 	floating_range          => $floating_ip_range,
 	fixed_range             => $fixed_network_range,
 	# by default it does not enable multi-host mode
@@ -143,7 +223,7 @@ class control($crosstalk_ip) {
 	keystone_admin_token    => $keystone_admin_token,
 	glance_db_password      => $glance_db_password,
 	glance_user_password    => $glance_user_password,
-        glance_sql_connection   => $glance_sql_connection,
+        glance_sql_connection   => "mysql://glance:${glance_db_password}@${controller_node_address}/glance",
         glance_on_swift         => $glance_on_swift,
 	nova_db_password        => $nova_db_password,
 	nova_user_password      => $nova_user_password,
@@ -161,7 +241,7 @@ class control($crosstalk_ip) {
 	quantum_ip_overlap              => false,
 	libvirt_vif_driver      	=> 'nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver',
 	host         		 	=> 'controller',
-	quantum_sql_connection       	=> "mysql://quantum:quantum@${controller_node_address}/quantum",
+	quantum_sql_connection       	=> "mysql://quantum:quantum@${local_address}/quantum",
 	quantum_auth_host            	=> "${controller_node_address}",
 	quantum_auth_port            	=> "35357",
 	quantum_rabbit_host          	=> "${controller_node_address}",
@@ -182,7 +262,7 @@ class control($crosstalk_ip) {
 	ovs_local_ip             	=> $crosstalk_ip,
 	ovs_server               	=> false,
 	ovs_root_helper          	=> "sudo quantum-rootwrap /etc/quantum/rootwrap.conf",
-	ovs_sql_connection       	=> "mysql://quantum:quantum@${controller_node_address}/quantum",
+	ovs_sql_connection       	=> "mysql://quantum:quantum@localhost/quantum",
 	quantum_db_password      	=> "quantum",
 	quantum_db_name        	 	=> 'quantum',
 	quantum_db_user          	=> 'quantum',
@@ -198,7 +278,7 @@ class control($crosstalk_ip) {
 	quantum_region               	=> 'RegionOne',
 	l3_interface_driver          	=> "quantum.agent.linux.interface.OVSInterfaceDriver",
 	l3_use_namespaces            	=> "True",
-	l3_metadata_ip               	=> "${controller_node_address}",
+	l3_metadata_ip               	=> "${controller_node_external}",
 	l3_external_network_bridge   	=> "br-ex",
 	l3_root_helper               	=> "sudo /usr/bin/quantum-rootwrap /etc/quantum/rootwrap.conf",
 	#quantum dhcp
@@ -212,7 +292,7 @@ class control($crosstalk_ip) {
 # This same module may be useable for forcing bonded interfaces as well
 
   if $::node_gateway {
-    network_config { "$::private_interface":
+    network_config { "$::management_interface":
       ensure => 'present',
       hotplug => false,
       family => 'inet',
@@ -228,7 +308,7 @@ class control($crosstalk_ip) {
       notify => Service['networking'],
     }
   } else {
-    network_config { "$::private_interface":
+    network_config { "$::management_interface":
       ensure => 'present',
       hotplug => false,
       family => 'inet',
@@ -278,19 +358,19 @@ class control($crosstalk_ip) {
 class compute($internal_ip, $crosstalk_ip) {
 
     class { 'openstack::compute':
-	public_interface   => $public_interface,
-	private_interface  => $private_interface,
-	internal_address   => $internal_ip,
-	libvirt_type       => 'kvm',
+	external_interface   => $external_interface,
+	management_interface => $management_interface,
+	management_address   => $internal_ip,
+	libvirt_type       => $libvirt_type,
 	fixed_range        => $fixed_network_range,
 	network_manager    => 'nova.network.quantum.manager.QuantumManager',
 	multi_host         => $multi_host,
-	sql_connection     => $sql_connection,
+	sql_connection     => "mysql://nova:${nova_db_password}@${controller_node_address}/nova",
 	nova_user_password => $nova_user_password,
-	rabbit_host        => $controller_node_internal,
+	rabbit_host        => $controller_node_management,
 	rabbit_password    => $rabbit_password,
 	rabbit_user        => $rabbit_user,
-	glance_api_servers => "${controller_node_internal}:9292",
+	glance_api_servers => "${controller_node_management}:9292",
 	vncproxy_host      => $controller_node_public,
 	vnc_enabled        => 'true',
 	verbose            => $verbose,
@@ -312,7 +392,7 @@ class compute($internal_ip, $crosstalk_ip) {
 	quantum_log_debug            	=> false,
 	quantum_bind_host            	=> "0.0.0.0",
 	quantum_bind_port            	=> "9696",
-	quantum_sql_connection       	=> "mysql://quantum:quantum@${controller_node_address}/quantum",
+	quantum_sql_connection       	=> "mysql://quantum:quantum@${local_address}/quantum",
 	quantum_auth_host            	=> "${controller_node_address}",
 	quantum_auth_port            	=> "35357",
 	quantum_rabbit_host          	=> "${controller_node_address}",
@@ -336,7 +416,7 @@ class compute($internal_ip, $crosstalk_ip) {
 	ovs_local_ip             	=> $crosstalk_ip,
 	ovs_server               	=> false,
 	ovs_root_helper          	=> "sudo quantum-rootwrap /etc/quantum/rootwrap.conf",
-	ovs_sql_connection       	=> "mysql://quantum:quantum@${controller_node_address}/quantum",
+	ovs_sql_connection       	=> "mysql://quantum:quantum@localhost/quantum",
     }
 
     class { "naginator::compute_target":
@@ -350,30 +430,14 @@ class compute($internal_ip, $crosstalk_ip) {
 # Definition of this node should match the name assigned to the build node in your deployment.
 # In this example we are using build-node, you dont need to use the FQDN. 
 #
-node master-node inherits "cobbler-node" {
-    $build_node_fqdn = "${::build_node_name}.${::domain_name}"
 
-    host { $build_node_fqdn: 
-	ip => $::cobbler_node_ip
-    }
-
-    host { $::build_node_name: 
-	ip => $::cobbler_node_ip
-    }
-
-    # Change the servers for your NTP environment
-    # (Must be a reachable NTP Server by your build-node, i.e. ntp.esl.cisco.com)
-    class { ntp:
-	servers 	=> [$::company_ntp_server],
-	ensure 		=> running,
-	autoupdate 	=> true,
-    }
+node build-base inherits base {
 
     class { 'naginator':
     }
 
     class { 'graphite': 
-	graphitehost 	=> $build_node_fqdn,
+	graphitehost 	=> "$build_node_fqdn",
     }
 
     # set up a local apt cache.  Eventually this may become a local mirror/repo instead
@@ -461,3 +525,49 @@ node master-node inherits "cobbler-node" {
     }
 }
 
+node cobbler-base inherits build-base {
+
+####### Shared Variables from Site.pp #######
+$cobbler_node_fqdn              = "${::build_node_name}.${::domain_name}"
+
+####### Preseed File Configuration #######
+ cobbler::ubuntu::preseed { "cisco-preseed":
+  admin_user            => $::admin_user,
+  password_crypted      => $::password_crypted,
+  packages              => "openssh-server vim vlan lvm2 ntp puppet",
+  ntp_server            => $::build_node_fqdn,
+  late_command          => "sed -e '/logdir/ a pluginsync=true' -i /target/etc/puppet/puppet.conf ; \
+        sed -e \"/logdir/ a server=$cobbler_node_fqdn\" -i /target/etc/puppet/puppet.conf ; \
+        echo -e \"server $cobbler_node_fqdn iburst\" > /target/etc/ntp.conf ; \
+        echo '8021q' >> /target/etc/modules ; \
+        true
+        ",
+  proxy                 => "http://${cobbler_node_fqdn}:3142/",
+  expert_disk           => true,
+  diskpart              => [$::install_drive],
+  boot_disk             => $::install_drive,
+  autostart_puppet      => $::autostart_puppet
+ }
+
+
+class { cobbler:
+  node_subnet           => $::node_subnet,
+  node_netmask          => $::node_netmask,
+  node_gateway          => $::node_gateway,
+  node_dns              => $::cobbler_node_ip,
+  ip                    => $::cobbler_node_ip,
+  dns_service           => $::dns_service,
+  dhcp_service          => $::dhcp_service,
+# change these two if a dynamic DHCP pool is needed
+  dhcp_ip_low           => false,
+  dhcp_ip_high          => false,
+  domain_name           => $::domain_name,
+  password_crypted      => $::password_crypted,
+}
+
+# This will load the Ubuntu Server OS into cobbler
+# COE supprts only Ubuntu precise x86_64
+ cobbler::ubuntu { "precise":
+  proxy => $::proxy,
+ }
+}
