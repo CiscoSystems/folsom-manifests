@@ -15,12 +15,41 @@
 #      have qualified only a specific release for your environment and do
 #      not wish to (yet) use the latest stable updates.
 #      Example: "folsom/snapshots/2012.2.2"
+#
+# If you require a proxy to reach the internet, set appropriate values
+# for HTTP_PROXY, HTTPS_PROXY, FTP_PROXY, and/or NO_PROXY below.  If you
+# don't specify a value for any of those variables, none will be used.
 echo "Getting Puppet Modules"
 REPO_NAME=folsom-proposed
 FILE_LIST=modules.list
-REPO=https://github.com/CiscoSystems/
+#REPO=http://128.107.252.163/openstack/cisco
+REPO=ftp://ftpeng.cisco.com/openstack/cisco
 PUPPET_PATH=/etc/puppet/
 APT_CONFIG_FILE=/etc/apt/sources.list.d/cisco-openstack-mirror_folsom.list
+HTTP_PROXY=
+HTTPS_PROXY=
+NO_PROXY=
+FTP_PROXY=
+
+# Export proxy statements into the environment.
+if [ HTTP_PROXY ]
+	then
+	export HTTP_PROXY=$HTTP_PROXY
+fi
+if [ HTTPS_PROXY ]
+        then
+        export HTTPS_PROXY=$HTTPS_PROXY
+fi
+if [ FTP_PROXY ]
+        then
+        export FTP_PROXY=$FTP_PROXY
+fi
+if [ NO_PROXY ]
+        then
+        export NO_PROXY=$NO_PROXY
+fi
+
+
 
 # Install the repo key.
 echo '-----BEGIN PGP PUBLIC KEY BLOCK-----
@@ -59,8 +88,8 @@ UcXHbA==
 if [ ! -f $APT_CONFIG_FILE ]
 	then
 	echo "# cisco-openstack-mirror_folsom" > $APT_CONFIG_FILE
-	echo "deb ftp://ftpeng.cisco.com/openstack/cisco $REPO_NAME  main" >> $APT_CONFIG_FILE
-	echo "deb-src ftp://ftpeng.cisco.com/openstack/cisco $REPO_NAME main" >> $APT_CONFIG_FILE
+	echo "deb $REPO $REPO_NAME  main" >> $APT_CONFIG_FILE
+	echo "deb-src $REPO $REPO_NAME main" >> $APT_CONFIG_FILE
 else
         echo "Repo already configured in $APT_CONFIG_FILE; assuming it is correct and not adding an additional repo configuration."
 fi
