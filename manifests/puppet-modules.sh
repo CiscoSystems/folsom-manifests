@@ -26,30 +26,6 @@ FILE_LIST=modules.list
 REPO=ftp://ftpeng.cisco.com/openstack/cisco
 PUPPET_PATH=/etc/puppet/
 APT_CONFIG_FILE=/etc/apt/sources.list.d/cisco-openstack-mirror_folsom.list
-HTTP_PROXY=
-HTTPS_PROXY=
-NO_PROXY=
-FTP_PROXY=
-
-# Export proxy statements into the environment.
-if [ HTTP_PROXY ]
-	then
-	export HTTP_PROXY=$HTTP_PROXY
-fi
-if [ HTTPS_PROXY ]
-        then
-        export HTTPS_PROXY=$HTTPS_PROXY
-fi
-if [ FTP_PROXY ]
-        then
-        export FTP_PROXY=$FTP_PROXY
-fi
-if [ NO_PROXY ]
-        then
-        export NO_PROXY=$NO_PROXY
-fi
-
-
 
 # Install the repo key.
 echo '-----BEGIN PGP PUBLIC KEY BLOCK-----
