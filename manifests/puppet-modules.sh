@@ -20,7 +20,7 @@
 # for HTTP_PROXY, HTTPS_PROXY, FTP_PROXY, and/or NO_PROXY below.  If you
 # don't specify a value for any of those variables, none will be used.
 echo "Getting Puppet Modules"
-REPO_NAME=folsom-proposed
+REPO_NAME=folsom
 FILE_LIST=modules.list
 #REPO=http://128.107.252.163/openstack/cisco
 REPO=ftp://ftpeng.cisco.com/openstack/cisco
