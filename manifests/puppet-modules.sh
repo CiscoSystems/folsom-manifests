@@ -15,10 +15,6 @@
 #      have qualified only a specific release for your environment and do
 #      not wish to (yet) use the latest stable updates.
 #      Example: "folsom/snapshots/2012.2.2"
-#
-# If you require a proxy to reach the internet, set appropriate values
-# for HTTP_PROXY, HTTPS_PROXY, FTP_PROXY, and/or NO_PROXY below.  If you
-# don't specify a value for any of those variables, none will be used.
 echo "Getting Puppet Modules"
 REPO_NAME=folsom
 FILE_LIST=modules.list
