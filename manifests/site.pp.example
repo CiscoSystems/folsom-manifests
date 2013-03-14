@@ -158,7 +158,7 @@ node /build-node/ inherits master-node {
 # OpenStack controller, and change the "mac" to the MAC address of the boot interface of your
 # OpenStack controller. Change the "ip" to the IP address of your OpenStack controller
 
-  cobbler_node { "control-server": node_type => "control", mac => "00:11:22:33:44:55:66", ip => "192.168.242.10", power_address  => "192.168.242.110" }
+  cobbler_node { "control-server": node_type => "control", mac => "00:11:22:33:44:55", ip => "192.168.242.10", power_address  => "192.168.242.110" }
 
 # This block defines the first compute server. Replace "compute_server01" with the host name
 # of your first OpenStack compute node, and change the "mac" to the MAC address of the boot
@@ -166,10 +166,10 @@ node /build-node/ inherits master-node {
 # OpenStack compute node
 
 # Begin compute node
-  cobbler_node { "compute-server01": node_type => "compute", mac => "11:22:33:44:55:66:77", ip => "192.168.242.21", power_address  => "192.168.242.121" }
+  cobbler_node { "compute-server01": node_type => "compute", mac => "00:11:22:33:44:66", ip => "192.168.242.21", power_address  => "192.168.242.121" }
 # Example with UCS blade power_address with a sub-group (in UCSM), and a ServiceProfile for power_id
 # you will need to change power type to 'USC' in the define macro above 
-#  cobbler_node { "compute-server01": node_type => "compute", mac => "11:22:33:44:55:66:77", ip => "192.168.242.21", power_address  => "192.168.242.121:org-cisco", power_id => "OpenStack-1" }
+#  cobbler_node { "compute-server02": node_type => "compute", mac => "00:11:22:33:44:67", ip => "192.168.242.22", power_address  => "192.168.242.122:org-cisco", power_id => "OpenStack-1" }
 # End compute node
 
 ### Repeat as needed ###
