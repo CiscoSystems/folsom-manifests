@@ -120,6 +120,11 @@ node os_base inherits base {
     class { "naginator::base_target":
     }
 
+    # This value can be set to true to increase debug logging when
+    # trouble-shooting services. It should not generally be set to
+    # true as it is known to break some OpenStack components
+    $verbose            = false
+
 }
 
 class control($crosstalk_ip) {
