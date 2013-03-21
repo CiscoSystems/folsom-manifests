@@ -1,0 +1,50 @@
+# Machines with this class get administrative users installed according to who is permitted to log in.
+# All admins can su.
+
+# TODO needs to set either the ssh authkeys or the password for each user.  Does neither at the moment.
+
+define coe_admin($key = undef) {
+    group { $name: ensure => present, }
+    user { $name: ensure => present,
+	gid => $name,
+	groups => ['adm', 'sudo'],
+	require => [Group[$name]],
+    }
+
+    if($key) {
+
+
+        file { "/home/$name":
+            ensure => directory,
+            require => User[$name],
+            owner => $name,
+            group => $name,
+            mode => 755,
+        }
+	file { "/home/$name/.ssh":
+	    ensure => directory,
+	    require => User[$name],
+	    owner => $name,
+	    group => $name,
+	    mode => 700,
+	}
+	exec { "/bin/echo $key >> /home/$name/.ssh/authorized_keys":
+	    unless => "/bin/fgrep '$key' /home/$name/.ssh/authorized_keys"
+        } <-
+	file { "/home/$name/.ssh/authorized_keys":
+	    ensure => present,
+	    owner => $name,
+	    group => $name,
+	    mode => 600,
+	}
+    }
+}
+
+######################################################################
+
+class coe_admins {
+    coe_admin{'dave_the_admin': }
+	key => 'ssh-rsa a-super-long-rsa-key dave_the_admin@laptop',
+    }
+}
+  

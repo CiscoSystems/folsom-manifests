@@ -1,3 +1,29 @@
+# This describes the hardware of the nodes to the extent required to network-install their
+# OS.
+# Change this to suit your hardware; the supplied configuration works for UCS models with CIMC
+# using a default password.
+# If you have multiple different hardware types or disk configurations you may need to use
+# multiple block types here.
+define cobbler_node($node_type, $mac, $ip, $power_address, $power_id = undef, $power_user => "admin", $power_password => "password") {
+  cobbler::node { $name:
+    mac 	   => $mac,
+    ip 		   => $ip,
+    ### UCS CIMC Details ###
+    # Change these parameters to match the management console settings for your server
+    power_address  => $power_address,
+    power_user 	   => "admin",
+    power_password => "password",
+    power_type     => "ipmitool",
+    power_id       => $power_id,
+    ### Advanced Users Configuration ###
+    # These parameters typically should not be changed
+    profile 	   => "precise-x86_64-auto",
+    domain         => $::domain_name,
+    node_type 	   => $node_type,
+    preseed 	   => "cisco-preseed",
+  }
+}
+
 # A node definition for cobbler
 # You will likely also want to change the IP addresses, domain name, and perhaps
 # even the proxy address
