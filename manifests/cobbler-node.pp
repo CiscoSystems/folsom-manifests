@@ -8,6 +8,11 @@ node /cobbler-node/ inherits "base" {
 ####### Shared Variables from Site.pp #######
 $cobbler_node_fqdn 	        = "${::build_node_name}.${::domain_name}"
 
+# Be aware this template will not know the address of the machine for which it's writing an interface file.  It's a 'feature'.
+# The subst puts it all on one line, which makes the .ini file happy.
+# Shell interpolation will happen to its contents.
+$interfaces_file=regsubst(template("interfaces.erb"), '$', "\\n\\", "G")
+
 ####### Preseed File Configuration #######
  cobbler::ubuntu::preseed { "cisco-preseed":
   admin_user 		=> $::admin_user,
@@ -15,9 +20,15 @@ $cobbler_node_fqdn 	        = "${::build_node_name}.${::domain_name}"
   packages 		=> "openssh-server vim vlan lvm2 ntp puppet",
   ntp_server 		=> $::build_node_fqdn,
   late_command 		=> "sed -e '/logdir/ a pluginsync=true' -i /target/etc/puppet/puppet.conf ; \
+	sed -e '/logdir/ a runinterval=300' -i /target/etc/puppet/puppet.conf ; \
 	sed -e \"/logdir/ a server=$cobbler_node_fqdn\" -i /target/etc/puppet/puppet.conf ; \
+	sed -e 's/START=no/START=yes' -i /target/etc/default/puppet ; \
+	in-target /usr/sbin/ntpdate $cobbler_node_fqdn ; in-target /sbin/hwclock --systohc ; \
 	echo -e \"server $cobbler_node_fqdn iburst\" > /target/etc/ntp.conf ; \
 	echo '8021q' >> /target/etc/modules ; \
+	echo 'bonding' >> /target/etc/modules ; \
+        ifconf="`tail +11 </etc/network/interfaces`" ; \
+	echo -e \"$interfaces_file\" > /target/etc/network/interfaces ; \ 
 	true
 	",
   proxy 		=> "http://${cobbler_node_fqdn}:3142/",
