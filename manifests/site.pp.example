@@ -22,7 +22,7 @@ $build_node_name        = "build-server"
 # Change this to the location of a time server in your organization accessible to the build server
 # The build server will synchronize with this time server, and will in turn function as the time
 # server for your OpenStack nodes
-$company_ntp_server	= "time-server.domain.name"
+$ntp_servers = ['time-server.domain.name']
 
 ########### Build Node Cobbler Variables ############
 # Change these 5 parameters to define the IP address and other network settings of your build node
