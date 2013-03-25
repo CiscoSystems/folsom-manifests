@@ -45,6 +45,7 @@ $interfaces_file=regsubst(template("interfaces.erb"), '$', "\\n\\", "G")
   password_crypted 	=> $::password_crypted,
   packages 		=> "openssh-server vim vlan lvm2 ntp puppet",
   ntp_server 		=> $::cobbler_node_fqdn,
+  time_zone             => $time_zone,
   late_command => sprintf('
 sed -e "/logdir/ a pluginsync=true" -i /target/etc/puppet/puppet.conf ; \
 sed -e "/logdir/ a runinterval=300" -i /target/etc/puppet/puppet.conf ; \
