@@ -4,7 +4,7 @@
 # using a default password.
 # If you have multiple different hardware types or disk configurations you may need to use
 # multiple block types here.
-define cobbler_node($node_type, $mac, $ip, $power_address, $power_id = undef, $power_user => "admin", $power_password => "password") {
+define cobbler_node($node_type, $mac, $ip, $power_address, $power_id = undef, $power_user = "admin", $power_password = "password") {
   cobbler::node { $name:
     mac 	   => $mac,
     ip 		   => $ip,
@@ -44,19 +44,20 @@ $interfaces_file=regsubst(template("interfaces.erb"), '$', "\\n\\", "G")
   admin_user 		=> $::admin_user,
   password_crypted 	=> $::password_crypted,
   packages 		=> "openssh-server vim vlan lvm2 ntp puppet",
-  ntp_server 		=> $::build_node_fqdn,
-  late_command 		=> "sed -e '/logdir/ a pluginsync=true' -i /target/etc/puppet/puppet.conf ; \
-	sed -e '/logdir/ a runinterval=300' -i /target/etc/puppet/puppet.conf ; \
-	sed -e \"/logdir/ a server=$cobbler_node_fqdn\" -i /target/etc/puppet/puppet.conf ; \
-	sed -e 's/START=no/START=yes' -i /target/etc/default/puppet ; \
-	in-target /usr/sbin/ntpdate $cobbler_node_fqdn ; in-target /sbin/hwclock --systohc ; \
-	echo -e \"server $cobbler_node_fqdn iburst\" > /target/etc/ntp.conf ; \
-	echo '8021q' >> /target/etc/modules ; \
-	echo 'bonding' >> /target/etc/modules ; \
-        ifconf="`tail +11 </etc/network/interfaces`" ; \
-	echo -e \"$interfaces_file\" > /target/etc/network/interfaces ; \ 
-	true
-	",
+  ntp_server 		=> $::cobbler_node_fqdn,
+  late_command => sprintf('
+sed -e "/logdir/ a pluginsync=true" -i /target/etc/puppet/puppet.conf ; \
+sed -e "/logdir/ a runinterval=300" -i /target/etc/puppet/puppet.conf ; \
+sed -e "/logdir/ a server=%s" -i /target/etc/puppet/puppet.conf ; \
+in-target /usr/sbin/ntpdate %s ; in-target /sbin/hwclock --systohc ; \
+sed -e "s/START=no/START=yes/" -i /target/etc/default/puppet ; \
+echo "8021q" >> /target/etc/modules ; \
+echo "bonding" >> /target/etc/modules ; \
+ifconf="`tail +11 </etc/network/interfaces`" ; \
+echo -e "%s
+" > /target/etc/network/interfaces ; \
+true
+', $::cobbler_node_fqdn, $::cobbler_node_fqdn, $interfaces_file),
   proxy 		=> "http://${cobbler_node_fqdn}:3142/",
   expert_disk 		=> true,
   diskpart 		=> [$::install_drive],
