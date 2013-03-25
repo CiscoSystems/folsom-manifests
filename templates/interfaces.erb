@@ -5,51 +5,16 @@
 auto lo
 iface lo inet loopback
 
-# Special interfaces; left down initially
-auto eth8
-iface eth8 inet manual
-auto eth9
-iface eth9 inet manual
-
-# Public network
-auto eth7
-iface eth7 inet manual
-   bond-master bond1
-auto eth4
-iface eth4 inet manual
-   bond-master bond1
-auto bond1
-iface bond1 inet manual
-    bond-mode 802.3ad
-    bond-miimon 100
-    bond-lacp-rate 1
-    bond-slaves none
-    up ifconfig bond1 up
-
-# Admin/backend network
 auto eth1
-iface eth1 inet manual
-   bond-master bond0
-
-# This should be a part of bond0, but because of problems sharing the internal network
-# with the openstack admin interface we've temporarily used them separately.
-# eth6 serves to pass traffic from the VMs, bond0 (eth1) does openstack admin
-# traffic
-auto eth6
-iface eth6 inet manual
-    up ifconfig eth6 up
-#   bond-master bond0
-
-# bond0 contains the PXE interface so we can't enable LACP on the switch
-auto bond0
-iface bond0 inet static
-    bond-slaves none
-    bond-mode active-backup
-    bond-miimon 100
+iface eth1 inet static
 $ifconf
 
-## This is a tap on bond0 that Openstack uses for its own networking.
-#auto os-tap
-#iface os-tap inet manual
-#    pre-up ip link add os-tap link bond0 type macvlan
-#    up ifconfig os-tap up
+auto <%= public_interface %>
+iface <%= public_interface %> inet static
+  address 0.0.0.0
+  netmask 255.255.255.255
+
+auto <%= external_interface %>
+iface <%= external_interface %> inet static
+  address 0.0.0.0
+  netmask 255.255.255.255
