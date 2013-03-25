@@ -11,8 +11,8 @@ define cobbler_node($node_type, $mac, $ip, $power_address, $power_id = undef, $p
     ### UCS CIMC Details ###
     # Change these parameters to match the management console settings for your server
     power_address  => $power_address,
-    power_user 	   => "admin",
-    power_password => "password",
+    power_user 	   => $power_user,
+    power_password => $power_password,
     power_type     => "ipmitool",
     power_id       => $power_id,
     ### Advanced Users Configuration ###
