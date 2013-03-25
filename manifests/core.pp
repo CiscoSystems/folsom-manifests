@@ -103,7 +103,7 @@ node os_base inherits base {
     $build_node_fqdn = "${::build_node_name}.${::domain_name}"
 
     class { ntp:
-	servers		=> $ntp_servers,
+	servers		=> [$build_node_fqdn],
 	ensure 		=> running,
 	autoupdate 	=> true,
     }
