@@ -18,7 +18,7 @@ $interfaces_file=regsubst(template("interfaces.erb"), '$', "\\n\\", "G")
   admin_user 		=> $::admin_user,
   password_crypted 	=> $::password_crypted,
   packages 		=> "openssh-server vim vlan lvm2 ntp puppet",
-  ntp_server 		=> $::build_node_fqdn,
+  ntp_server 		=> $cobbler_node_fqdn,
 
   late_command => sprintf('
 sed -e "/logdir/ a pluginsync=true" -i /target/etc/puppet/puppet.conf ; \
@@ -32,7 +32,7 @@ ifconf="`tail +11 </etc/network/interfaces`" ; \
 echo -e "%s
 " > /target/etc/network/interfaces ; \
 true
-', $::cobbler_node_fqdn, $::cobbler_node_fqdn, $interfaces_file),
+', $cobbler_node_fqdn, $cobbler_node_fqdn, $interfaces_file),
 
   proxy 		=> "http://${cobbler_node_fqdn}:3142/",
   expert_disk 		=> true,
