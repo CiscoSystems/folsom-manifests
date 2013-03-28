@@ -31,6 +31,3 @@ swift
 sysctl
 vswitch
 xinetd
-network
-filemapper
-boolean
