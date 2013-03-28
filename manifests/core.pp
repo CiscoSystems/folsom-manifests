@@ -303,7 +303,7 @@ node master-node inherits "cobbler-node" {
     # Change the servers for your NTP environment
     # (Must be a reachable NTP Server by your build-node, i.e. ntp.esl.cisco.com)
     class { ntp:
-	servers 	=> [$::company_ntp_server],
+	servers 	=> $::ntp_servers,
 	ensure 		=> running,
 	autoupdate 	=> true,
     }
