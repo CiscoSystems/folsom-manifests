@@ -213,6 +213,7 @@ $node_dns       = "${cobbler_node_ip}"
 $ip 		= "${cobbler_node_ip}"
 $dns_service 	= "dnsmasq"
 $dhcp_service 	= "dnsmasq"
+$time_zone      = "UTC"
 
 ### Puppet Parameters ###
 # These settings load other puppet components. They should not be changed
