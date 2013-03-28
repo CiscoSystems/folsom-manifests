@@ -1,0 +1,15 @@
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+auto <%= public_interface %>
+iface <%= public_interface %> inet static
+$ifconf
+
+auto <%= external_interface %>
+iface <%= external_interface %> inet static
+  address 0.0.0.0
+  netmask 255.255.255.255

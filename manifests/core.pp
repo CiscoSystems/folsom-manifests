@@ -208,68 +208,6 @@ class control($crosstalk_ip) {
 	dhcp_use_namespaces     	=> "True",
     }
 
-# Needed to ensure a proper "second" interface is online
-# This same module may be useable for forcing bonded interfaces as well
-
-  if $::node_gateway {
-    network_config { "$::private_interface":
-      ensure => 'present',
-      hotplug => false,
-      family => 'inet',
-      ipaddress => "$::controller_node_address",
-      method => 'static',
-      netmask => "$::node_netmask",
-      options => { 
-        "dns-search" => "$::domain_name",
-        "dns-nameservers" => "$::cobbler_node_ip", 
-        "gateway" => "$::node_gateway"
-      },
-      onboot => 'true',
-      notify => Exec['networking-restart'],
-    }
-  } else {
-    network_config { "$::private_interface":
-      ensure => 'present',
-      hotplug => false,
-      family => 'inet',
-      ipaddress => "$::controller_node_address",
-      method => 'static',
-      netmask => "$::node_netmask",
-      options => { 
-        "dns-search" => "$::domain_name",
-        "dns-nameservers" => "$::cobbler_node_ip", 
-      },
-      onboot => 'true',
-      notify => Exec['networking-restart'],
-    }
-  }
-
-  network_config { 'lo':
-    ensure => 'present',
-    hotplug => false,
-    family => 'inet',
-    method => 'loopback',
-    onboot => 'true',
-    notify => Exec['networking-restart'],
-  }
-
-  network_config { "$::external_interface":
-    ensure => 'present',
-    hotplug => false,
-    family => 'inet',
-    method => 'static',
-    ipaddress => '0.0.0.0',
-    netmask => '255.255.255.255',
-    onboot => 'true',
-    notify => Exec['networking-restart'],
-  }
-
-  exec {'networking-restart':
-    command     => '/etc/init.d/networking restart',
-    path        => '/usr/bin:/usr/sbin:/bin/sbin',
-    refreshonly => true,
-  }
-
   class { "naginator::control_target":
   }
 
