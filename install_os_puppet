@@ -100,6 +100,12 @@ if ! run_cmd cp /root/cisco-folsom-manifests/manifests/* /etc/puppet/manifests/ 
   exit 1
 fi
 
+echo "Copying templates to templates dir..."
+if ! run_cmd cp -R /root/cisco-folsom-manifests/templates /etc/puppet/ ;then
+  echo "Can't copy sample manifests!!!"
+  exit 1
+fi
+
 # Update APT again, to capture any changes and updates driven by the newly loaded code
 echo -e "\n\nUpdated apt repository...\n\n"
 if ! run_cmd apt-get $APT_CONFIG update; then
