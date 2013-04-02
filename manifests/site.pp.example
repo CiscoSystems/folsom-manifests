@@ -113,11 +113,6 @@ $rabbit_user             = 'openstack_rabbit_user'
 # Nova DB connection
 $sql_connection 	 = "mysql://${nova_user}:${nova_db_password}@${controller_node_address}/nova"
 
-
-# This value can be set to true to increase debug logging when trouble-shooting services
-# It should not generally be set to true as it can impact service operation
-$verbose                 = false
-
 #### end shared variables #################
 
 
