@@ -46,19 +46,19 @@ export -f run_cmd
 function git_clone_tag () {
     if [ -z "$PROXY" ]; then
         sudo git clone https://github.com/CiscoSystems/folsom-manifests /root/cisco-folsom-manifests
-        sudo bash -c "cd /root/cisco-folsom-manifests && git checkout $CURRENT_TAG"
+        sudo bash -c "cd /root/cisco-folsom-manifests && git checkout -q $CURRENT_TAG"
     else
         sudo env https_proxy=$PROXY git clone https://github.com/CiscoSystems/folsom-manifests /root/cisco-folsom-manifests
-        sudo env https_proxy=$PROXY bash -c "cd /root/cisco-folsom-manifests && git checkout $CURRENT_TAG"
+        sudo env https_proxy=$PROXY bash -c "cd /root/cisco-folsom-manifests && git checkout -q $CURRENT_TAG"
     fi
 }
 export -f git_clone_tag
 
 function git_fetch_tag () {
     if [ -z "$PROXY" ]; then
-        sudo bash -c "cd /root/cisco-folsom-manifests && git fetch --all && git checkout $CURRENT_TAG"
+        sudo bash -c "cd /root/cisco-folsom-manifests && git fetch --all && git checkout -q $CURRENT_TAG"
     else
-        sudo env https_proxy=$PROXY bash -c "cd /root/cisco-folsom-manifests && git fetch --all && git checkout $CURRENT_TAG"
+        sudo env https_proxy=$PROXY bash -c "cd /root/cisco-folsom-manifests && git fetch --all && git checkout -q $CURRENT_TAG"
     fi
 }
 export -f git_fetch_tag
