@@ -18,7 +18,8 @@
 echo "Getting Puppet Modules"
 REPO_NAME=folsom
 FILE_LIST=modules.list
-REPO=https://github.com/CiscoSystems/
+#REPO=http://128.107.252.163/openstack/cisco
+REPO=ftp://ftpeng.cisco.com/openstack/cisco
 PUPPET_PATH=/etc/puppet/
 APT_CONFIG_FILE=/etc/apt/sources.list.d/cisco-openstack-mirror_folsom.list
 
@@ -59,8 +60,8 @@ UcXHbA==
 if [ ! -f $APT_CONFIG_FILE ]
 	then
 	echo "# cisco-openstack-mirror_folsom" > $APT_CONFIG_FILE
-	echo "deb ftp://ftpeng.cisco.com/openstack/cisco $REPO_NAME  main" >> $APT_CONFIG_FILE
-	echo "deb-src ftp://ftpeng.cisco.com/openstack/cisco $REPO_NAME main" >> $APT_CONFIG_FILE
+	echo "deb $REPO $REPO_NAME  main" >> $APT_CONFIG_FILE
+	echo "deb-src $REPO $REPO_NAME main" >> $APT_CONFIG_FILE
 else
         echo "Repo already configured in $APT_CONFIG_FILE; assuming it is correct and not adding an additional repo configuration."
 fi
