@@ -15,7 +15,9 @@ $location 		= "ftp://ftpeng.cisco.com/openstack/cisco"
 # Alternate, uncomment this one, and comment out the one above
 #$location		= "http://128.107.252.163/openstack/cisco"
 ########### Build Node (Cobbler, Puppet Master, NTP) ######
-# Change the following to the host name you have given your build node
+# Change the following to the host name you have given your build node.
+# This name should be in all lower case letters due to a Puppet limitation
+# (refer to http://projects.puppetlabs.com/issues/1168).
 $build_node_name        = "build-server"
 
 ########### NTP Configuration ############
@@ -63,8 +65,10 @@ $autostart_puppet       = true
 # These values define parameters which will be used to deploy and configure OpenStack
 # once Ubuntu is installed on your nodes
 #
-# Change these next 3 parameters to the network settings of the node which will be your
-# OpenStack control node
+# Change these next 3 parameters to the network settings of the node which 
+# will be your OpenStack control node.  Note that the $controller_hostname
+# should be in all lowercase letters due to a limitation of Puppet
+# (refer to http://projects.puppetlabs.com/issues/1168).
 $controller_node_address       = '192.168.242.10'
 $controller_node_network       = '192.168.242.0'
 $controller_hostname           = 'control-server'
@@ -123,16 +127,20 @@ $sql_connection 	 = "mysql://${nova_user}:${nova_db_password}@${controller_node_
 
 node /build-node/ inherits master-node {
 
-# This block defines the control server. Replace "control_server" with the host name of your
-# OpenStack controller, and change the "mac" to the MAC address of the boot interface of your
-# OpenStack controller. Change the "ip" to the IP address of your OpenStack controller
+# This block defines the control server. Replace "control_server" with the 
+# host name of your OpenStack controller and change the "mac" to the 
+# MAC address of the boot interface of your OpenStack controller. Change 
+# the "ip" to the IP address of your OpenStack controller.
 
   cobbler_node { "control-server": node_type => "control", mac => "00:11:22:33:44:55", ip => "192.168.242.10", power_address  => "192.168.242.110", power_user => "admin", power_password => "password", power_type => "ipmitool" }
 
-# This block defines the first compute server. Replace "compute_server01" with the host name
-# of your first OpenStack compute node, and change the "mac" to the MAC address of the boot
-# interface of your first OpenStack compute node. Change the "ip" to the IP address of your first
-# OpenStack compute node
+# This block defines the first compute server. Replace "compute_server01" 
+# with the host name of your first OpenStack compute node (note: the hostname
+# should be in all lowercase letters due to a limitation of Puppet; refer to
+# http://projects.puppetlabs.com/issues/1168), and change the 
+# "mac" to the MAC address of the boot interface of your first OpenStack 
+# compute node. Change the "ip" to the IP address of your first
+# OpenStack compute node.
 
 # Begin compute node
   cobbler_node { "compute-server01": node_type => "compute", mac => "00:11:22:33:44:66", ip => "192.168.242.21", power_address  => "192.168.242.121" }
@@ -156,7 +164,9 @@ node /build-node/ inherits master-node {
 # Change build_server to the host name of your build node
 node build-server inherits build-node { }
 
-# Change control_server to the host name of your control node
+# Change control_server to the host name of your control node.  Note that the
+# hostname should be in all lowercase letters due to a limitation of Puppet
+# (refer to http://projects.puppetlabs.com/issues/1168).
 node control-server inherits os_base { class { control: crosstalk_ip => '192.168.242.10'} }
 
 # Change compute_server01 to the host name of your first compute node
