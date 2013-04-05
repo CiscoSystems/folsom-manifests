@@ -3,7 +3,7 @@
 # even the proxy address
 
 define cobbler_node($node_type, $mac, $ip, $power_address, $power_id = undef, 
-  $power_user => 'admin', power_password => 'password', power_type => 'ipmitool' ) {
+  $power_user = 'admin', $power_password = 'password', $power_type = 'ipmitool' ) {
   cobbler::node { $name:
     mac            => $mac,
     ip             => $ip,
