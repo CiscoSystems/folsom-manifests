@@ -46,7 +46,6 @@ sed -e "/logdir/ a pluginsync=true" -i /target/etc/puppet/puppet.conf ; \
 sed -e "/logdir/ a runinterval=300" -i /target/etc/puppet/puppet.conf ; \
 sed -e "/logdir/ a server=%s" -i /target/etc/puppet/puppet.conf ; \
 in-target /usr/sbin/ntpdate %s ; in-target /sbin/hwclock --systohc ; \
-sed -e "s/START=no/START=yes/" -i /target/etc/default/puppet ; \
 echo "8021q" >> /target/etc/modules ; \
 echo "bonding" >> /target/etc/modules ; \
 ifconf="`tail +11 </etc/network/interfaces`" ; \
