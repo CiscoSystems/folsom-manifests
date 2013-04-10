@@ -194,6 +194,9 @@ $dns_service 	= "dnsmasq"
 $dhcp_service 	= "dnsmasq"
 $time_zone      = "UTC"
 
+# Enable ipv6 router edvertisement
+#$ipv6_ra = '1'
+
 ### Puppet Parameters ###
 # These settings load other puppet components. They should not be changed
 import 'cobbler-node'
