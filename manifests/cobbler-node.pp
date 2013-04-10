@@ -62,7 +62,7 @@ ifconf="`tail +11 </etc/network/interfaces`" ; \
 echo -e "%s
 " > /target/etc/network/interfaces ; \
 true
-', $cobbler_node_fqdn, $cobbler_node_fqdn, $ra,$ra,$ra,$ra,interfaces_file),
+', $cobbler_node_fqdn, $cobbler_node_fqdn, $ra,$ra,$ra,$ra,$interfaces_file),
 
   proxy 		=> "http://${cobbler_node_fqdn}:3142/",
   expert_disk 		=> true,
