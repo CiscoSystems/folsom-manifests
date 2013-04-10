@@ -76,6 +76,7 @@ class { cobbler:
   dhcp_ip_high          => false,
   domain_name 		=> $::domain_name,
   password_crypted 	=> $::password_crypted,
+  ucsm_port             => $::ucsm_port,
 }
 
 # This will load the Ubuntu Server OS into cobbler
