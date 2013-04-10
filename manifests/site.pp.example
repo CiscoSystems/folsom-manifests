@@ -64,6 +64,7 @@ $autostart_puppet       = true
 # By default the UCSM is enabled to accept requests on port 443(https)
 # If https is disabled and only http is used, set 
 # $ucsm_port = '80'
+$ucsm_port = '443'
 ########### OpenStack Variables ############
 # These values define parameters which will be used to deploy and configure OpenStack
 # once Ubuntu is installed on your nodes
