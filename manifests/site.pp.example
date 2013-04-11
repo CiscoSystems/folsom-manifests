@@ -194,6 +194,9 @@ $dns_service 	= "dnsmasq"
 $dhcp_service 	= "dnsmasq"
 $time_zone      = "UTC"
 
+# Enable network interface bonding. This will only enable the bonding module in the OS, it won't acutally bond any interfaces. Edit the networking interfaces template to set up interface bonds as required after setting this to true should bonding be required.
+#$interface_bonding = 'true'
+
 ### Puppet Parameters ###
 # These settings load other puppet components. They should not be changed
 import 'cobbler-node'

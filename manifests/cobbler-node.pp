@@ -29,6 +29,12 @@ node /cobbler-node/ inherits "base" {
 ####### Shared Variables from Site.pp #######
 $cobbler_node_fqdn 	        = "${::build_node_name}.${::domain_name}"
 
+if ($::interface_bonding == 'true'){
+  $bonding = 'echo "bonding" >> /target/etc/modules ; \ '
+} else {
+  $bonding = ''
+}
+
 # Be aware this template will not know the address of the machine for which it's writing an interface file.  It's a 'feature'.
 # The subst puts it all on one line, which makes the .ini file happy.
 # Shell interpolation will happen to its contents.
@@ -47,12 +53,12 @@ sed -e "/logdir/ a runinterval=300" -i /target/etc/puppet/puppet.conf ; \
 sed -e "/logdir/ a server=%s" -i /target/etc/puppet/puppet.conf ; \
 in-target /usr/sbin/ntpdate %s ; in-target /sbin/hwclock --systohc ; \
 echo "8021q" >> /target/etc/modules ; \
-echo "bonding" >> /target/etc/modules ; \
+%s 
 ifconf="`tail +11 </etc/network/interfaces`" ; \
 echo -e "%s
 " > /target/etc/network/interfaces ; \
 true
-', $cobbler_node_fqdn, $cobbler_node_fqdn, $interfaces_file),
+', $cobbler_node_fqdn, $cobbler_node_fqdn, $bonding, $interfaces_file),
 
   proxy 		=> "http://${cobbler_node_fqdn}:3142/",
   expert_disk 		=> true,
