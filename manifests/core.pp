@@ -127,7 +127,46 @@ node os_base inherits base {
 
 }
 
+# A class because its simple implementation can only renumber one interface pair on startup
+class numbered_vs_port($pair) {
+    # If an interface with an address is put into a switch, you need to add a fix for bootup
+    # and also do a similar fix during the initial add.
+
+    $mapping = split($pair, ":")
+    $bridge = $mapping[0]
+    $port = $mapping[1]
+
+    # Add the port to the bridge, as normal...
+    # NB: copied from quantum::plugin::ovs::port
+    vs_port {$port:
+        ensure => present,
+        bridge => $bridge,
+        require => Vs_bridge[$bridge],
+        notify => Service['openvswitch-fix-interface'] # but ensure that the IP address remains reachable
+    }
+
+    file { "/etc/init.d/openvswitch-fix-interface":
+        owner => 'root',
+        group => 'root',
+        mode => '755',
+        content => template('openvswitch-fix-interface.erb'),
+    }
+    # TODO: is this service guaranteed not to start until the vs_port is created?
+    service { 'openvswitch-fix-interface':
+        ensure => 'running',
+        enable => true,
+        require => Vs_port[$port],
+    }
+}
+
 class control($crosstalk_ip) {
+
+    # Optionally assign an interface address to an OVS port
+    if ($::numbered_vs_port == 'true') {
+        class { numbered_vs_port: pair => 'br-int:$::public_interface'}
+    }  elsif ($::numbered_vs_port != '') {
+        class { numbered_vs_port: pair => '$::numbered_vs_port'}
+    }
 
     class { 'openstack::controller':
 	public_address          => $controller_node_public,
@@ -220,6 +259,12 @@ class control($crosstalk_ip) {
 
 
 class compute($internal_ip, $crosstalk_ip) {
+    # Optionally assign an interface address to an OVS port
+    if ($::numbered_vs_port == 'true') {
+        class { numbered_vs_port: pair => 'br-int:$::public_interface'}
+    } elsif ($::numbered_vs_port != '') {
+        class { numbered_vs_port: pair => '$::numbered_vs_port'}
+    }
 
     class { 'openstack::compute':
 	public_interface   => $public_interface,
