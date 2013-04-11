@@ -194,6 +194,9 @@ $dns_service 	= "dnsmasq"
 $dhcp_service 	= "dnsmasq"
 $time_zone      = "UTC"
 
+# Add interface address to attached openvswitch port
+#$numbered_vs_port = 'true'
+
 ### Puppet Parameters ###
 # These settings load other puppet components. They should not be changed
 import 'cobbler-node'
