@@ -35,6 +35,12 @@ if ($::interface_bonding == 'true'){
   $bonding = ''
 }
 
+if ($::node_gateway) {
+    $final_ifconf = "`tail +11 </etc/network/interfaces`"
+} else {
+    $final_ifconf = "`tail +11 </etc/network/interfaces | grep -v gateway`"
+}
+
 # Be aware this template will not know the address of the machine for which it's writing an interface file.  It's a 'feature'.
 # The subst puts it all on one line, which makes the .ini file happy.
 # Shell interpolation will happen to its contents.
@@ -53,12 +59,12 @@ sed -e "/logdir/ a runinterval=300" -i /target/etc/puppet/puppet.conf ; \
 sed -e "/logdir/ a server=%s" -i /target/etc/puppet/puppet.conf ; \
 in-target /usr/sbin/ntpdate %s ; in-target /sbin/hwclock --systohc ; \
 echo "8021q" >> /target/etc/modules ; \
-%s 
-ifconf="`tail +11 </etc/network/interfaces`" ; \
+%s
+ifconf=%s ; \
 echo -e "%s
 " > /target/etc/network/interfaces ; \
 true
-', $cobbler_node_fqdn, $cobbler_node_fqdn, $bonding, $interfaces_file),
+', $cobbler_node_fqdn, $cobbler_node_fqdn, $bonding, $final_ifconf, $interfaces_file),
 
   proxy 		=> "http://${cobbler_node_fqdn}:3142/",
   expert_disk 		=> true,
