@@ -96,7 +96,7 @@ $external_interface	 	= 'eth1'
 
 # Select the drive on which Ubuntu and OpenStack will be installed in each node. Current assumption is
 # that all nodes will be installed on the same device name
-$install_drive           = '/dev/sdc'
+$install_drive           = '/dev/sda'
 
 ########### OpenStack Service Credentials ############
 # This block of parameters is used to change the user names and passwords used by the services which
@@ -196,6 +196,11 @@ $time_zone      = "UTC"
 
 # Enable ipv6 router edvertisement
 #$ipv6_ra = '1'
+
+# Enable network interface bonding. This will only enable the bonding module in the OS, 
+# it won't acutally bond any interfaces. Edit the networking interfaces template to set 
+# up interface bonds as required after setting this to true should bonding be required.
+#$interface_bonding = 'true'
 
 ### Puppet Parameters ###
 # These settings load other puppet components. They should not be changed

@@ -29,6 +29,12 @@ node /cobbler-node/ inherits "base" {
 ####### Shared Variables from Site.pp #######
 $cobbler_node_fqdn 	        = "${::build_node_name}.${::domain_name}"
 
+if ($::interface_bonding == 'true'){
+  $bonding = 'echo "bonding" >> /target/etc/modules ; \ '
+} else {
+  $bonding = ''
+}
+
 # Be aware this template will not know the address of the machine for which it's writing an interface file.  It's a 'feature'.
 # The subst puts it all on one line, which makes the .ini file happy.
 # Shell interpolation will happen to its contents.
@@ -57,12 +63,12 @@ echo "net.ipv6.conf.default.accept_ra=%s" >> /target/etc/sysctl.conf ; \
 echo "net.ipv6.conf.all.autoconf=%s" >> /target/etc/sysctl.conf ; \
 echo "net.ipv6.conf.all.accept_ra=%s" >> /target/etc/sysctl.conf ; \
 echo "8021q" >> /target/etc/modules ; \
-echo "bonding" >> /target/etc/modules ; \
+%s 
 ifconf="`tail +11 </etc/network/interfaces`" ; \
 echo -e "%s
 " > /target/etc/network/interfaces ; \
 true
-', $cobbler_node_fqdn, $cobbler_node_fqdn, $ra,$ra,$ra,$ra,$interfaces_file),
+', $cobbler_node_fqdn, $cobbler_node_fqdn, $ra,$ra,$ra,$ra, $bonding, $interfaces_file),
 
   proxy 		=> "http://${cobbler_node_fqdn}:3142/",
   expert_disk 		=> true,
