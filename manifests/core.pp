@@ -336,10 +336,11 @@ node master-node inherits "cobbler-node" {
         
         file {  "/var/www":
             ensure => 'directory',
-	}
+        }
 
         file {  "/var/www/packages":
-            ensure => 'directory',
+            ensure  => 'directory',
+            require => File['/var/www'],
         }
 
         if($::proxy) {
