@@ -176,6 +176,16 @@ node control-server inherits os_base { class { control: crosstalk_ip => '192.168
 # Change compute_server01 to the host name of your first compute node
 node compute-server01 inherits os_base { class { compute: internal_ip => '192.168.242.21', crosstalk_ip => '192.168.242.21'} }
 
+# Openstack parameters can be fine tuned:
+#node compute-server02 inherits os_base { 
+#  class { 
+#    compute: internal_ip => '192.168.242.21', 
+#    crosstalk_ip => '192.168.242.21',
+#
+#    vnc_enabled => 'false'  
+#  } 
+#}
+
 ### Repeat as needed ###
 # Copy the compute_server01 line above and paste a copy here for each additional OpenStack node in
 # your cluster. Be sure to replace the compute_server01 parameter with the correct host name for
