@@ -60,7 +60,11 @@ $cobbler_proxy 		= "http://${cobbler_node_ip}:3142/"
 $admin_user 		= 'localadmin'
 $password_crypted 	= '$6$UfgWxrIv$k4KfzAEMqMg.fppmSOTd0usI4j6gfjs0962.JXsoJRWa5wMz8yQk4SfInn4.WZ3L/MCt5u.62tHDGB36EhiKF1'
 $autostart_puppet       = true
-
+# If the setup uses the UCS Bseries blades, enter the port on which the ucsm accepts requests. 
+# By default the UCSM is enabled to accept requests on port 443(https)
+# If https is disabled and only http is used, set 
+# $ucsm_port = '80'
+$ucsm_port = '443'
 ########### OpenStack Variables ############
 # These values define parameters which will be used to deploy and configure OpenStack
 # once Ubuntu is installed on your nodes
