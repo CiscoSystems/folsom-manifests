@@ -202,6 +202,9 @@ $time_zone      = "UTC"
 # up interface bonds as required after setting this to true should bonding be required.
 #$interface_bonding = 'true'
 
+# Add interface address to attached openvswitch port
+#$numbered_vs_port = 'true'
+
 ### Puppet Parameters ###
 # These settings load other puppet components. They should not be changed
 import 'cobbler-node'

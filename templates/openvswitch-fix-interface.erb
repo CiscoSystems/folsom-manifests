@@ -1,0 +1,111 @@
+#! /bin/sh
+#
+# Copyright (C) 2011 Nicira Networks, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at:
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+### BEGIN INIT INFO
+# Provides:          openvswitch-fix-interface
+# Required-Start:    $openvswitch-switch
+# Required-Stop:     $remote_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Open vSwitch switch - transfer of interface config to switch from an incorporated port
+### END INIT INFO
+
+port=<%= port %>
+switch=<%= bridge %>
+
+(test -x /usr/sbin/ovs-vswitchd && test -x /usr/sbin/ovsdb-server) || exit 0
+
+. /usr/share/openvswitch/scripts/ovs-lib
+test -e /etc/default/openvswitch-switch && . /etc/default/openvswitch-switch
+
+if test X"$BRCOMPAT" = Xyes && test ! -x /usr/sbin/ovs-brcompatd; then
+    BRCOMPAT=no
+    log_warning_msg "ovs-brcompatd missing, disabling bridge compatibility"
+fi
+
+ovs_ctl () {
+    set /usr/share/openvswitch/scripts/ovs-ctl "$@"
+    if test X"$BRCOMPAT" = Xyes; then
+        set "$@" --brcompat
+    fi
+    "$@"
+}
+
+RUNFILE=/var/run/openvswitch-fix-interface
+
+# This isn't really a service, so it keeps a runfile in place to indicate what's happening
+start () {
+
+    if [ ! -f $RUNFILE ] ; then
+	# Transfer address config from port to switch - remove from port first, then add to switch
+
+	/usr/share/openvswitch/scripts/ovs-save $port | sed -e '/# global/,$d' \
+	    | sed -e "s/$port/$switch/g" > $RUNFILE 
+	ip addr flush $port # remove config
+	. $RUNFILE # add config
+
+    fi
+}
+
+stop () {
+    # You might think we'd transfer the config back, but actually
+    # stopping OVS doesn't remove $port from $switch, so we don't.
+    # If you have to force this, then:
+    # ./this-script unpick
+    # will remove the port from the switch.
+    :
+}
+
+unpick() {
+    if [ -f $RUNFILE ] ; then
+	ovs_ctl del-port $switch $port # Network goes away here
+	tmpfile=`mktemp /tmp/xfrXXX`
+	sed -e "s/$switch/$port/g" < $RUNFILE  > $tmpfile
+	ip addr flush $switch # remove config
+	. $tmpfile # add config, returning network to working order
+	rm $RUNFILE $tmpfile
+    fi
+}
+
+
+case $1 in
+    start)
+        start
+	;;
+    stop | force-stop)
+        stop
+        ;;
+    reload | force-reload)
+        # The OVS daemons keep up-to-date.
+        ;;
+    status)
+        [ -f $RUNFILE ]
+	;;
+    unpick)
+	# A special command
+        unpick
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|force-reload|status|force-stop|unpick}" >&2
+        exit 1
+        ;;
+esac
+
+exit 0
