@@ -206,6 +206,10 @@ $time_zone      = "UTC"
 # Add interface address to attached openvswitch port
 #$numbered_vs_port = 'true'
 
+# Configure the maximum number of times mysql-server will allow
+# a host to fail connecting before banning it
+$max_connect_errors = '10'
+
 ### Puppet Parameters ###
 # These settings load other puppet components. They should not be changed
 import 'cobbler-node'
