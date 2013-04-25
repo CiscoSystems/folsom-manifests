@@ -46,6 +46,12 @@ if ($::node_gateway) {
 # Shell interpolation will happen to its contents.
 $interfaces_file=regsubst(template("interfaces.erb"), '$', "\\n\\", "G")
 
+if ($::ipv6_ra == "") {
+  $ra='0'
+} else {
+  $ra = $::ipv6_ra 
+}
+
 ####### Preseed File Configuration #######
  cobbler::ubuntu::preseed { "cisco-preseed":
   admin_user 		=> $::admin_user,
@@ -58,13 +64,16 @@ sed -e "/logdir/ a pluginsync=true" -i /target/etc/puppet/puppet.conf ; \
 sed -e "/logdir/ a runinterval=300" -i /target/etc/puppet/puppet.conf ; \
 sed -e "/logdir/ a server=%s" -i /target/etc/puppet/puppet.conf ; \
 in-target /usr/sbin/ntpdate %s ; in-target /sbin/hwclock --systohc ; \
+echo "net.ipv6.conf.default.autoconf=%s" >> /target/etc/sysctl.conf ; \
+echo "net.ipv6.conf.default.accept_ra=%s" >> /target/etc/sysctl.conf ; \
+echo "net.ipv6.conf.all.autoconf=%s" >> /target/etc/sysctl.conf ; \
+echo "net.ipv6.conf.all.accept_ra=%s" >> /target/etc/sysctl.conf ; \
 echo "8021q" >> /target/etc/modules ; \
 %s
 ifconf=%s ; \
 echo -e "%s
 " > /target/etc/network/interfaces ; \
-', $cobbler_node_fqdn, $cobbler_node_fqdn, $bonding, $final_ifconf, $interfaces_file),
-
+', $cobbler_node_fqdn, $cobbler_node_fqdn, $ra,$ra,$ra,$ra, $bonding, $final_ifconf, $interfaces_file),
   proxy 		=> "http://${cobbler_node_fqdn}:3142/",
   expert_disk 		=> true,
   diskpart 		=> [$::install_drive],
@@ -72,7 +81,6 @@ echo -e "%s
   autostart_puppet      => $::autostart_puppet,
   time_zone             => $::time_zone
  }
-
 
 class { cobbler: 
   node_subnet 		=> $::node_subnet, 
