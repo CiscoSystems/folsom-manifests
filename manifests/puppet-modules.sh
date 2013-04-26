@@ -60,7 +60,7 @@ UcXHbA==
 if [ ! -f $APT_CONFIG_FILE ]
 	then
 	echo "# cisco-openstack-mirror_folsom" > $APT_CONFIG_FILE
-	echo "deb $REPO $REPO_NAME  main" >> $APT_CONFIG_FILE
+	echo "deb $REPO $REPO_NAME main" >> $APT_CONFIG_FILE
 	echo "deb-src $REPO $REPO_NAME main" >> $APT_CONFIG_FILE
 else
         echo "Repo already configured in $APT_CONFIG_FILE; assuming it is correct and not adding an additional repo configuration."
