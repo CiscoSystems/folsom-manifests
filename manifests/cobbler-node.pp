@@ -30,7 +30,7 @@ node /cobbler-node/ inherits "base" {
 $cobbler_node_fqdn 	        = "${::build_node_name}.${::domain_name}"
 
 if ($::interface_bonding == 'true'){
-  $bonding = 'echo "bonding" >> /target/etc/modules ; \ '
+  $bonding = "echo 'bonding' >> /target/etc/modules ; \\"
 } else {
   $bonding = ''
 }
