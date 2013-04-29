@@ -14,17 +14,19 @@ $proxy			= "{{ config.proxy }}"
 # instead try our http distribution location. Note the http location is not
 # a permanent location and may change at any time.
 $location 		= "ftp://ftpeng.cisco.com/openstack/cisco"
-# Alternate, uncomment this one, and coment out the one above
+# Alternate, uncomment this one, and comment out the one above
 #$location		= "http://128.107.252.163/openstack/cisco"
 ########### Build Node (Cobbler, Puppet Master, NTP) ######
-# Change the following to the host name you have given your build node
+# Change the following to the host name you have given your build node.
+# This name should be in all lower case letters due to a Puppet limitation
+# (refer to http://projects.puppetlabs.com/issues/1168).
 $build_node_name        = "{{ job.build_node.name }}"
 
 ########### NTP Configuration ############
 # Change this to the location of a time server in your organization accessible to the build server
 # The build server will synchronize with this time server, and will in turn function as the time
 # server for your OpenStack nodes
-$company_ntp_server	= "{{ config.ntp_server }}"
+$ntp_servers	= ["{{ config.ntp_server }}"]
 
 ########### Build Node Cobbler Variables ############
 # Change these 5 parameters to define the IP address and other network settings of your build node
@@ -39,7 +41,7 @@ $node_gateway 		= '{{ config.gateway }}'
 # This domain name will be the name your build and compute nodes use for the local DNS
 # It doesn't have to be the name of your corporate DNS - a local DNS server on the build
 # node will serve addresses in this domain - but if it is, you can also add entries for
-# the nodes in your corporate DNS iand they will be usable *if* the above addresses 
+# the nodes in your corporate DNS environment they will be usable *if* the above addresses 
 # are routeable from elsewhere in your network.
 $domain_name 		= '{{ config.domain }}'
 # This setting likely does not need to be changed
@@ -60,13 +62,19 @@ $cobbler_proxy 		= "http://${cobbler_node_ip}:3142/"
 $admin_user 		= '{{ config.admin_user }}'
 $password_crypted 	= '{{ config.admin_password_crypted }}'
 $autostart_puppet       = true
-
+# If the setup uses the UCS Bseries blades, enter the port on which the ucsm accepts requests. 
+# By default the UCSM is enabled to accept requests on port 443(https)
+# If https is disabled and only http is used, set 
+# $ucsm_port = '80'
+$ucsm_port = '443'
 ########### OpenStack Variables ############
 # These values define parameters which will be used to deploy and configure OpenStack
 # once Ubuntu is installed on your nodes
 #
-# Change these next 3 parameters to the network settings of the node which will be your
-# OpenStack control node
+# Change these next 3 parameters to the network settings of the node which 
+# will be your OpenStack control node.  Note that the $controller_hostname
+# should be in all lowercase letters due to a limitation of Puppet
+# (refer to http://projects.puppetlabs.com/issues/1168).
 $controller_node_address       = '{{ job.control_node.ip }}'
 $controller_node_network       = '{{ config.subnet }}'
 $controller_hostname           = '{{ job.control_node.name }}'
@@ -87,14 +95,14 @@ $controller_node_internal      = $controller_node_address
 # This is also known as the Management Interface
 $public_interface        	= 'eth0'
 # Define the interface used for vm networking connectivity when nova-network is being used.
-# Quantum does not required this value, so using eth0 will typically be fine. 
+# Quantum does not require this value, so using eth0 will typically be fine. 
 $private_interface		= 'eth0'
 # Specify the interface used for external connectivity such as floating IPs (only in network/controller node)
 $external_interface	 	= 'eth1'
 
 # Select the drive on which Ubuntu and OpenStack will be installed in each node. Current assumption is
 # that all nodes will be installed on the same device name
-$install_drive           = '/dev/sdc'
+$install_drive           = '/dev/sda'
 
 ########### OpenStack Service Credentials ############
 # This block of parameters is used to change the user names and passwords used by the services which
@@ -115,11 +123,6 @@ $rabbit_user             = 'openstack_rabbit_user'
 # Nova DB connection
 $sql_connection 	 = "mysql://${nova_user}:${nova_db_password}@${controller_node_address}/nova"
 
-
-# This value can be set to true to increase debug logging when trouble-shooting services
-# It should not generally be set to true as it can impact service operation
-$verbose                 = false
-
 #### end shared variables #################
 
 
@@ -128,51 +131,30 @@ $verbose                 = false
 # for OpenStack. Cobbler will automate the installation of Ubuntu onto these nodes using
 # these settings
 
-# This describes the hardware of the nodes to the extent required to network-install their
-# OS.
-# Change this to suit your hardware; the supplied configuration works for UCSes with CIMC
-# using a default password.
-# If you have multiple different hardware types or disk configurations you may need to use
-# multiple block types here.
-define cobbler_node($node_type, $mac, $ip, $power_address, $power_user, $power_password, $power_type, $power_id) {
-  cobbler::node { $name:
-    mac 	   => $mac,
-    ip 		   => $ip,
-    ### UCS CIMC Details ###
-    # Change these parameters to match the management console settings for your server
-    power_address  => $power_address,
-    power_user 	 => $power_user,
-    power_password => $power_password,
-    power_type     => $power_type,
-    power_id       => $power_id,
-    ### Advanced Users Configuration ###
-    # These parameters typically should not be changed
-    profile 	   => "precise-x86_64-auto",
-    domain         => $::domain_name,
-    node_type 	   => $node_type,
-    preseed 	   => "cisco-preseed",
-    log_host       => "{{ job.logging.host }}",
-    log_port       => "{{ job.logging.port }}",
-  }
-}
-
 node /build-node/ inherits master-node {
 
-# This block defines the control server. Replace "control_server" with the host name of your
-# OpenStack controller, and change the mac to the MAC address of the boot interface of your
-# OpenStack controller. Change the ip to the IP address of your OpenStack controller
+# This block defines the control server. Replace "control_server" with the 
+# host name of your OpenStack controller and change the "mac" to the 
+# MAC address of the boot interface of your OpenStack controller. Change 
+# the "ip" to the IP address of your OpenStack controller.
 
   cobbler_node { "{{ job.control_node.name }}": node_type => "control", mac => "{{ job.control_node.mac }}", ip => "{{ job.control_node.ip }}", power_address => "{{ job.control_node.power_address }}", power_user => "{{ job.control_node.power_user }}", power_password => "{{ job.control_node.power_password }}", power_type => "{{ job.control_node.power_type }}", power_id => "{{ job.control_node.power_id }}" }
 
-# This block defines the first compute server. Replace "compute_server01" with the host name
-# of your first OpenStack compute node, and change the mac to the MAC address of the boot
-# interface of your first OpenStack compute node. Change the ip to the IP address of your first
-# OpenStack compute node
+# This block defines the first compute server. Replace "compute_server01" 
+# with the host name of your first OpenStack compute node (note: the hostname
+# should be in all lowercase letters due to a limitation of Puppet; refer to
+# http://projects.puppetlabs.com/issues/1168), and change the 
+# "mac" to the MAC address of the boot interface of your first OpenStack 
+# compute node. Change the "ip" to the IP address of your first
+# OpenStack compute node.
 
 # Begin compute node
 #{% for node in job.compute_nodes %}
   cobbler_node { "{{ node.name }}": node_type => "compute", mac => "{{ node.mac }}", ip => "{{ node.ip }}", power_address  => "{{ node.power_address }}", power_user => "{{ node.power_user }}", power_password => "{{ node.power_password }}", power_type => "{{ node.power_type }}", power_id => "{{ node.power_id }}" }
 #{% endfor %}
+# Example with UCS blade power_address with a sub-group (in UCSM), and a ServiceProfile for power_id
+# you will need to change power type to 'USC' in the define macro above 
+#  cobbler_node { "compute-server02": node_type => "compute", mac => "00:11:22:33:44:67", ip => "192.168.242.22", power_address  => "192.168.242.122:org-cisco", power_id => "OpenStack-1" }
 # End compute node
 
 ### Repeat as needed ###
@@ -190,13 +172,25 @@ node /build-node/ inherits master-node {
 # Change build_server to the host name of your build node
 node /{{ job.build_node.fqdn }}/ inherits build-node { }
 
-# Change control_server to the host name of your control node
-node /{{ job.control_node.fqdn }}/ inherits os_base { class { control: crosstalk_ip => '{{ job.control_node.ip }}'} }
+# Change control_server to the host name of your control node.  Note that the
+# hostname should be in all lowercase letters due to a limitation of Puppet
+# (refer to http://projects.puppetlabs.com/issues/1168).
+node {{ job.control_node.fqdn }} inherits os_base { class { control: crosstalk_ip => '{{ job.control_node.ip }}'} }
 
 # Change compute_server01 to the host name of your first compute node
 #{% for node in job.compute_nodes %}
 node /{{ node.fqdn }}/ inherits os_base { class { compute: internal_ip => '{{ node.ip }}', crosstalk_ip => '{{ node.ip }}'} }
 #{% endfor %}
+
+# Openstack parameters can be fine tuned:
+#node compute-server02 inherits os_base { 
+#  class { 
+#    compute: internal_ip => '192.168.242.21', 
+#    crosstalk_ip => '192.168.242.21',
+#
+#    vnc_enabled => 'false'  
+#  } 
+#}
 
 ### Repeat as needed ###
 # Copy the compute_server01 line above and paste a copy here for each additional OpenStack node in
@@ -218,6 +212,22 @@ $node_dns       = "${cobbler_node_ip}"
 $ip 		= "${cobbler_node_ip}"
 $dns_service 	= "dnsmasq"
 $dhcp_service 	= "dnsmasq"
+$time_zone      = "UTC"
+
+# Enable ipv6 router edvertisement
+#$ipv6_ra = '1'
+
+# Enable network interface bonding. This will only enable the bonding module in the OS, 
+# it won't acutally bond any interfaces. Edit the networking interfaces template to set 
+# up interface bonds as required after setting this to true should bonding be required.
+#$interface_bonding = 'true'
+
+# Add interface address to attached openvswitch port
+#$numbered_vs_port = 'true'
+
+# Configure the maximum number of times mysql-server will allow
+# a host to fail connecting before banning it
+$max_connect_errors = '10'
 
 ### Puppet Parameters ###
 # These settings load other puppet components. They should not be changed

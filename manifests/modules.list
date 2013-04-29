@@ -2,10 +2,10 @@ apache
 apt
 apt-cacher-ng
 cobbler
+coe
 collectd
 concat
 corosync
-create_resources
 dnsmasq
 drbd
 glance
@@ -16,11 +16,11 @@ keystone
 memcached
 monit
 mysql
-nagios
+naginator
 nova
 ntp
 openstack
-openstack_admin
+openstack-admin
 pip
 puppet
 quantum
@@ -31,6 +31,3 @@ swift
 sysctl
 vswitch
 xinetd
-network
-filemapper
-boolean
