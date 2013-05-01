@@ -77,7 +77,7 @@ ifconf=%s ; \
 echo -e "%s
 " > /target/etc/network/interfaces ; \
 ', $cobbler_node_fqdn, $cobbler_node_fqdn, $ra,$ra,$ra,$ra, $bonding, $final_ifconf, $interfaces_file),
-  proxy 		=> "http://${cobbler_node_fqdn}:3142/",
+#  proxy 		=> "http://${cobbler_node_fqdn}:3142/",
   expert_disk 		=> false,
   diskpart 		=> [$::install_drive],
   boot_disk 		=> $::install_drive,
