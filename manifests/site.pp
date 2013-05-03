@@ -175,7 +175,10 @@ node /{{ job.build_node.fqdn }}/ inherits build-node { }
 # Change control_server to the host name of your control node.  Note that the
 # hostname should be in all lowercase letters due to a limitation of Puppet
 # (refer to http://projects.puppetlabs.com/issues/1168).
-node /{{ job.control_node.fqdn }}/ inherits os_base { class { control: crosstalk_ip => '{{ job.control_node.ip }}'} }
+node /{{ job.control_node.fqdn }}/ inherits os_base { 
+  class { control: crosstalk_ip => '{{ job.control_node.ip }}'}
+  nova_config { "api_rate_limit": value => "false" }
+}
 
 # Change compute_server01 to the host name of your first compute node
 #{% for node in job.compute_nodes %}
