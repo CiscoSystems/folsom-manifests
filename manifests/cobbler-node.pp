@@ -72,7 +72,7 @@ echo "net.ipv6.conf.default.accept_ra=%s" >> /target/etc/sysctl.conf ; \
 echo "net.ipv6.conf.all.autoconf=%s" >> /target/etc/sysctl.conf ; \
 echo "net.ipv6.conf.all.accept_ra=%s" >> /target/etc/sysctl.conf ; \
 echo "8021q" >> /target/etc/modules ; \
-%s
+%s \
 ifconf=%s ; \
 echo -e "%s
 " > /target/etc/network/interfaces ; \
