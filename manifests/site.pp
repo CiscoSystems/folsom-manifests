@@ -102,7 +102,7 @@ $external_interface	 	= 'eth1'
 
 # Select the drive on which Ubuntu and OpenStack will be installed in each node. Current assumption is
 # that all nodes will be installed on the same device name
-$install_drive           = '/dev/sda'
+$install_drive           = 'FIRST_USABLE'
 
 ########### OpenStack Service Credentials ############
 # This block of parameters is used to change the user names and passwords used by the services which
