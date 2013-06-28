@@ -32,7 +32,7 @@ $ntp_servers	= ["{{ config.ntp_server }}"]
 # Change these 5 parameters to define the IP address and other network settings of your build node
 # The cobbler node *must* have this IP configured and it *must* be on the same network as
 # the hosts to install
-$cobbler_node_ip 	= '{{ job.build_node.ip }}'
+$cobbler_node_ip 	= '{{ job.build_node.internal_ip }}'
 $node_subnet 		= '{{ config.subnet }}'
 $node_netmask 		= '{{ config.netmask }}'
 # This gateway is optional - if there's a gateway providing a default route, put it here
@@ -75,7 +75,7 @@ $ucsm_port = '443'
 # will be your OpenStack control node.  Note that the $controller_hostname
 # should be in all lowercase letters due to a limitation of Puppet
 # (refer to http://projects.puppetlabs.com/issues/1168).
-$controller_node_address       = '{{ job.control_node.ip }}'
+$controller_node_address       = '{{ job.control_node.internal_ip }}'
 $controller_node_network       = '{{ config.subnet }}'
 $controller_hostname           = '{{ job.control_node.name }}'
 # Specify the network which should have access to the MySQL database on the OpenStack control
@@ -138,7 +138,7 @@ node /build-node/ inherits master-node {
 # MAC address of the boot interface of your OpenStack controller. Change 
 # the "ip" to the IP address of your OpenStack controller.
 
-  cobbler_node { "{{ job.control_node.name }}": node_type => "control", mac => "{{ job.control_node.mac }}", ip => "{{ job.control_node.ip }}", power_address => "{{ job.control_node.power_address }}", power_user => "{{ job.control_node.power_user }}", power_password => "{{ job.control_node.power_password }}", power_type => "{{ job.control_node.power_type }}", power_id => "{{ job.control_node.power_id }}" }
+  cobbler_node { "{{ job.control_node.name }}": node_type => "control", mac => "{{ job.control_node.mac }}", ip => "{{ job.control_node.internal_ip }}", power_address => "{{ job.control_node.power_address }}", power_user => "{{ job.control_node.power_user }}", power_password => "{{ job.control_node.power_password }}", power_type => "{{ job.control_node.power_type }}", power_id => "{{ job.control_node.power_id }}" }
 
 # This block defines the first compute server. Replace "compute_server01" 
 # with the host name of your first OpenStack compute node (note: the hostname
@@ -150,7 +150,7 @@ node /build-node/ inherits master-node {
 
 # Begin compute node
 #{% for node in job.compute_nodes %}
-  cobbler_node { "{{ node.name }}": node_type => "compute", mac => "{{ node.mac }}", ip => "{{ node.ip }}", power_address  => "{{ node.power_address }}", power_user => "{{ node.power_user }}", power_password => "{{ node.power_password }}", power_type => "{{ node.power_type }}", power_id => "{{ node.power_id }}" }
+  cobbler_node { "{{ node.name }}": node_type => "compute", mac => "{{ node.mac }}", ip => "{{ node.internal_ip }}", power_address  => "{{ node.power_address }}", power_user => "{{ node.power_user }}", power_password => "{{ node.power_password }}", power_type => "{{ node.power_type }}", power_id => "{{ node.power_id }}" }
 #{% endfor %}
 # Example with UCS blade power_address with a sub-group (in UCSM), and a ServiceProfile for power_id
 # you will need to change power type to 'USC' in the define macro above 
@@ -176,13 +176,13 @@ node /{{ job.build_node.fqdn }}/ inherits build-node { }
 # hostname should be in all lowercase letters due to a limitation of Puppet
 # (refer to http://projects.puppetlabs.com/issues/1168).
 node /{{ job.control_node.fqdn }}/ inherits os_base { 
-  class { control: crosstalk_ip => '{{ job.control_node.ip }}'}
+  class { control: crosstalk_ip => '{{ job.control_node.internal_ip }}'}
   nova_config { "api_rate_limit": value => "false" }
 }
 
 # Change compute_server01 to the host name of your first compute node
 #{% for node in job.compute_nodes %}
-node /{{ node.fqdn }}/ inherits os_base { class { compute: internal_ip => '{{ node.ip }}', crosstalk_ip => '{{ node.ip }}'} }
+node /{{ node.fqdn }}/ inherits os_base { class { compute: internal_ip => '{{ node.internal_ip }}', crosstalk_ip => '{{ node.internal_ip }}'} }
 #{% endfor %}
 
 # Openstack parameters can be fine tuned:
