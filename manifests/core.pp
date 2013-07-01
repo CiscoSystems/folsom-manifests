@@ -60,13 +60,6 @@ node base {
     # (the equivalent work for apt is done by the cobbler boot, which sets this up as
     # a part of the installation.)
 
-
-    # /etc/hosts entries for the controller nodes
-    host { "${::controller_hostname}.${::domain_name}":
-	ip => $::controller_node_internal,
-        host_aliases => "${::controller_hostname}"
-    }
-
     class { 'collectd':
         graphitehost		=> $build_node_fqdn,
 	management_interface	=> $::public_interface,
