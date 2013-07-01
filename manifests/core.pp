@@ -62,8 +62,9 @@ node base {
 
 
     # /etc/hosts entries for the controller nodes
-    host { $::controller_hostname:
-	ip => $::controller_node_internal
+    host { "${::controller_hostname}.${::domain_name}":
+	ip => $::controller_node_internal,
+        host_aliases => "${::controller_hostname}"
     }
 
     class { 'collectd':
@@ -456,11 +457,8 @@ node master-node inherits "cobbler-node" {
     $build_node_fqdn = "${::build_node_name}.${::domain_name}"
 
     host { $build_node_fqdn: 
-	ip => $::cobbler_node_ip
-    }
-
-    host { $::build_node_name: 
-	ip => $::cobbler_node_ip
+	ip => $::cobbler_node_ip,
+        host_aliases => "${::build_node_name}"
     }
 
     # Change the servers for your NTP environment
