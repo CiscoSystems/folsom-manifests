@@ -33,11 +33,11 @@ $ntp_servers	= ["{{ config.ntp_server }}"]
 # The cobbler node *must* have this IP configured and it *must* be on the same network as
 # the hosts to install
 $cobbler_node_ip 	= '{{ job.build_node.internal_ip }}'
-$node_subnet 		= '{{ config.subnet }}'
-$node_netmask 		= '{{ config.netmask }}'
+$node_subnet 		= '{{ job.build_node.subnet }}'
+$node_netmask 		= '{{ job.build_node.netmask }}'
 # This gateway is optional - if there's a gateway providing a default route, put it here
 # If not, comment it out
-$node_gateway 		= '{{ config.gateway }}'
+$node_gateway 		= '{{ job.build_node.gateway }}'
 # This domain name will be the name your build and compute nodes use for the local DNS
 # It doesn't have to be the name of your corporate DNS - a local DNS server on the build
 # node will serve addresses in this domain - but if it is, you can also add entries for
