@@ -451,7 +451,7 @@ node master-node inherits "cobbler-node" {
 
     host { $build_node_fqdn: 
 	ip => $::cobbler_node_ip,
-        host_aliases => "${::build_node_name}"
+        host_aliases => ["${::build_node_name}", "puppet", "puppet.${::domain_name}"]
     }
 
     # Change the servers for your NTP environment
